@@ -1,0 +1,56 @@
+/* TheSevenTactics — Battle View */
+
+.battle-view {
+    display: flex; flex-direction: column; height: 100%; background: var(--bg-primary);
+}
+
+.battle-header {
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--bg-secondary); border-bottom: 2px solid var(--border-secondary);
+    display: flex; justify-content: space-between; align-items: center;
+}
+.battle-title { font-family: var(--font-bold); font-size: var(--font-size-md); color: var(--text-primary); }
+.battle-back { font-size: var(--font-size-xs); }
+
+.battle-arena {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    gap: var(--spacing-xl); padding: var(--spacing-md);
+}
+
+.battle-side { display: flex; flex-direction: column; gap: var(--spacing-sm); min-width: 120px; }
+.battle-side-label { font-family: var(--font-bold); font-size: var(--font-size-xs);
+    color: var(--text-muted); text-align: center; margin-bottom: var(--spacing-xs); }
+
+.battle-unit {
+    padding: var(--spacing-sm); background: var(--bg-card);
+    border: 2px solid var(--border-primary); min-height: 60px;
+}
+.battle-unit.ally { border-left: 3px solid var(--color-info); }
+.battle-unit.enemy { border-left: 3px solid var(--color-error); }
+.battle-unit.dead { opacity: 0.3; }
+
+.battle-unit-name { font-family: var(--font-bold); font-size: var(--font-size-xs); }
+.battle-unit-hp { margin-top: 4px; }
+.battle-unit-hp-bar { width: 100%; height: 6px; background: var(--hp-bar-bg);
+    border: 1px solid var(--border-primary); overflow: hidden; }
+.battle-unit-hp-fill { height: 100%; background: var(--hp-bar); }
+.battle-unit-hp-text { font-size: 9px; color: var(--text-muted); text-align: right; }
+
+.battle-vs { font-family: var(--font-bold); font-size: var(--font-size-xl); color: var(--text-accent);
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.8); }
+
+.battle-log {
+    max-height: 200px; overflow-y: auto; padding: var(--spacing-sm);
+    background: var(--bg-input); border-top: 2px solid var(--border-secondary);
+}
+.battle-log-entry { font-size: 9px; color: var(--text-secondary); padding: 1px 0; }
+.battle-log-entry.crit { color: var(--color-warning); }
+
+.battle-result {
+    padding: var(--spacing-lg); text-align: center;
+    background: var(--bg-secondary); border-top: 2px solid var(--border-secondary);
+}
+.battle-result-text { font-family: var(--font-bold); font-size: var(--font-size-xl); margin-bottom: var(--spacing-sm); }
+.battle-result-text.victory { color: var(--color-success); }
+.battle-result-text.defeat { color: var(--color-error); }
+.battle-rewards { font-size: var(--font-size-sm); color: var(--text-secondary); }

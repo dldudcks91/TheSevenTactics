@@ -5,6 +5,8 @@
 import TopBar from './main/top-bar.js';
 import LeftPanel from './main/left-panel.js';
 import TownView from './main/views/town-view.js';
+import TavernView from './main/views/tavern-view.js';
+import BattleView from './main/views/battle-view.js';
 import { apiCall } from './api.js';
 import { Store } from './store.js';
 import { showLoading, hideLoading } from './utils.js';
@@ -12,6 +14,8 @@ import { showLoading, hideLoading } from './utils.js';
 // 우측 뷰 모듈 맵
 const VIEW_MODULES = {
     town: TownView,
+    tavern: TavernView,
+    battle: BattleView,
 };
 
 const MainScreen = {

@@ -1,0 +1,23 @@
+/* TheSevenTactics — Stat Tab */
+
+.stat-tab { padding: var(--spacing-sm); }
+
+.stat-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: var(--spacing-xs) 0; border-bottom: 1px solid var(--border-primary);
+}
+.stat-label { font-family: var(--font-bold); font-size: var(--font-size-sm); color: var(--text-primary); min-width: 40px; }
+.stat-desc { font-size: var(--font-size-xs); color: var(--text-muted); flex: 1; margin: 0 var(--spacing-sm); }
+.stat-value { font-family: var(--font-bold); font-size: var(--font-size-md); color: var(--color-info); min-width: 30px; text-align: right; }
+
+.stat-sp-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: var(--spacing-sm) 0; margin-top: var(--spacing-sm);
+    border-top: 2px solid var(--border-secondary);
+}
+.stat-sp-label { font-family: var(--font-bold); font-size: var(--font-size-sm); color: var(--color-warning); }
+.stat-sp-value { font-family: var(--font-bold); font-size: var(--font-size-lg); color: var(--color-warning); }
+
+.stat-reset-btn {
+    margin-top: var(--spacing-sm); width: 100%;
+}

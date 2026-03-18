@@ -1,0 +1,35 @@
+/* TheSevenTactics — Party Tab */
+
+.party-tab { padding: var(--spacing-sm); }
+
+.party-slots { display: flex; gap: var(--spacing-sm); margin-bottom: var(--spacing-md); }
+
+.party-slot {
+    flex: 1; min-height: 80px; background: var(--bg-card);
+    border: 2px solid var(--border-primary); display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 4px; cursor: pointer;
+}
+.party-slot:hover { border-color: var(--border-secondary); }
+.party-slot.filled { border-color: var(--color-info); }
+.party-slot.slot-baal { border-color: var(--text-accent); cursor: default; }
+
+.party-slot-label { font-size: var(--font-size-xs); color: var(--text-muted); }
+.party-slot-name { font-family: var(--font-bold); font-size: var(--font-size-sm); color: var(--text-primary); }
+.party-slot-meta { font-size: 9px; color: var(--text-secondary); }
+
+.party-synergy {
+    padding: var(--spacing-sm); background: var(--bg-secondary);
+    border: 2px solid var(--border-secondary); box-shadow: var(--rpg-border-inset);
+}
+.party-synergy-name { font-family: var(--font-bold); font-size: var(--font-size-sm); color: var(--color-warning); }
+.party-synergy-desc { font-size: var(--font-size-xs); color: var(--text-secondary); }
+
+.party-hero-picker {
+    margin-top: var(--spacing-sm); display: flex; flex-direction: column; gap: var(--spacing-xs);
+}
+.party-picker-title { font-family: var(--font-bold); font-size: var(--font-size-xs); color: var(--text-accent); }
+.party-picker-item {
+    padding: var(--spacing-xs) var(--spacing-sm); background: var(--bg-card);
+    border: 2px solid var(--border-primary); cursor: pointer; font-size: var(--font-size-xs);
+}
+.party-picker-item:hover { background: var(--bg-tertiary); border-color: var(--border-secondary); }

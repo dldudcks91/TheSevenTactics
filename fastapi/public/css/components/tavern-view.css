@@ -1,0 +1,51 @@
+/* TheSevenTactics — Tavern View */
+
+.tavern-view {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; height: 100%; padding: var(--spacing-lg);
+    background: var(--bg-primary);
+}
+
+.tavern-panel {
+    background: var(--bg-secondary); border: 2px solid var(--border-secondary);
+    box-shadow: var(--rpg-border-outset); padding: var(--spacing-lg);
+    width: 100%; max-width: 400px; text-align: center;
+}
+
+.tavern-title {
+    font-family: var(--font-bold); font-size: var(--font-size-lg);
+    color: var(--text-accent); margin-bottom: var(--spacing-md);
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
+}
+
+.tavern-hero-name {
+    font-family: var(--font-bold); font-size: var(--font-size-xl);
+    margin-bottom: var(--spacing-xs);
+}
+.tavern-hero-name.grade-common { color: var(--rarity-normal); }
+.tavern-hero-name.grade-uncommon { color: var(--rarity-magic); }
+.tavern-hero-name.grade-rare { color: var(--rarity-rare); }
+.tavern-hero-name.grade-legendary { color: var(--rarity-unique); }
+
+.tavern-hero-meta {
+    font-size: var(--font-size-sm); color: var(--text-secondary);
+    margin-bottom: var(--spacing-md);
+}
+
+.tavern-hero-skills {
+    font-size: var(--font-size-xs); color: var(--text-muted);
+    margin-bottom: var(--spacing-md);
+}
+
+.tavern-cost {
+    font-family: var(--font-bold); font-size: var(--font-size-md);
+    color: var(--rarity-rare); margin-bottom: var(--spacing-md);
+}
+
+.tavern-buttons { display: flex; gap: var(--spacing-sm); justify-content: center; }
+.tavern-btn-recruit { min-width: 120px; }
+.tavern-btn-dismiss { min-width: 120px; }
+
+.tavern-empty {
+    font-size: var(--font-size-sm); color: var(--text-muted); padding: var(--spacing-xl) 0;
+}

@@ -2,18 +2,22 @@
  * TheSevenTactics — Left Panel (탭 구조)
  * 탭: 스탯 / 영웅 / 파티 / 장비 / 스킬트리
  */
+import StatTab from './tabs/stat.js';
+import HeroTab from './tabs/hero.js';
+import PartyTab from './tabs/party.js';
 
 const TABS = [
-    { id: 'stat', icon: '📊', label: '스탯' },
-    { id: 'hero', icon: '⚔️', label: '영웅' },
-    { id: 'party', icon: '👥', label: '파티' },
-    { id: 'equip', icon: '🛡️', label: '장비' },
-    { id: 'skill', icon: '🔮', label: '스킬' },
+    { id: 'stat', icon: '📊', label: '스탯', module: StatTab },
+    { id: 'hero', icon: '⚔️', label: '영웅', module: HeroTab },
+    { id: 'party', icon: '👥', label: '파티', module: PartyTab },
+    { id: 'equip', icon: '🛡️', label: '장비', module: null },
+    { id: 'skill', icon: '🔮', label: '스킬', module: null },
 ];
 
 const LeftPanel = {
     el: null,
     _currentTab: 'stat',
+    _currentModule: null,
 
     mount(el) {
         this.el = el;
@@ -28,37 +32,54 @@ const LeftPanel = {
                         </button>
                     `).join('')}
                 </div>
-                <div class="left-panel-content" id="lp-content">
-                    <div class="lp-tab-placeholder">스탯 (준비 중)</div>
-                </div>
+                <div class="left-panel-content" id="lp-content"></div>
             </div>
         `;
 
         this._handleEvent = this._onEvent.bind(this);
         el.addEventListener('pointerdown', this._handleEvent);
+
+        // 초기 탭 마운트
+        this._mountTab('stat');
     },
 
     unmount() {
+        if (this._currentModule && this._currentModule.unmount) {
+            this._currentModule.unmount();
+        }
         if (this._handleEvent) {
             this.el.removeEventListener('pointerdown', this._handleEvent);
         }
     },
 
     _onEvent(e) {
-        const target = e.target.closest('[data-action]');
+        const target = e.target.closest('[data-action="tab"]');
         if (!target) return;
 
-        if (target.dataset.action === 'tab') {
-            const tabId = target.dataset.tab;
-            if (tabId === this._currentTab) return;
+        const tabId = target.dataset.tab;
+        if (tabId === this._currentTab) return;
 
-            // 탭 활성화 전환
-            this.el.querySelectorAll('.lp-tab').forEach(btn => btn.classList.remove('active'));
-            target.classList.add('active');
+        this.el.querySelectorAll('.lp-tab').forEach(btn => btn.classList.remove('active'));
+        target.classList.add('active');
 
-            this._currentTab = tabId;
-            const content = this.el.querySelector('#lp-content');
-            const tab = TABS.find(t => t.id === tabId);
+        this._mountTab(tabId);
+    },
+
+    _mountTab(tabId) {
+        if (this._currentModule && this._currentModule.unmount) {
+            this._currentModule.unmount();
+        }
+
+        this._currentTab = tabId;
+        const content = this.el.querySelector('#lp-content');
+        const tab = TABS.find(t => t.id === tabId);
+
+        if (tab?.module) {
+            content.innerHTML = '';
+            this._currentModule = tab.module;
+            tab.module.mount(content);
+        } else {
+            this._currentModule = null;
             content.innerHTML = `<div class="lp-tab-placeholder">${tab?.label || tabId} (준비 중)</div>`;
         }
     },
