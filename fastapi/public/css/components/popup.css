@@ -1,0 +1,105 @@
+/* ============================================
+   TheSevenRPG — Popup (비교 팝업 / 단독 팝업)
+   ============================================ */
+
+.popup-container {
+    position: fixed;
+    z-index: 5000;
+    pointer-events: none;
+    opacity: 0;
+}
+
+.popup-container.show {
+    pointer-events: auto;
+    opacity: 1;
+}
+
+/* 비교 팝업: 좌우 나란히 */
+.popup-compare {
+    display: flex;
+    gap: 2px;
+}
+
+/* 팝업 카드 공통 */
+.popup-card {
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-secondary);
+    box-shadow: var(--rpg-border-outset), 4px 4px 0 rgba(0,0,0,0.5);
+    padding: var(--spacing-md);
+    min-width: 180px;
+    max-width: 220px;
+}
+
+.popup-single {
+    min-width: 200px;
+}
+
+/* 팝업 내부 구조 */
+.popup-header {
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+    margin-bottom: var(--spacing-xs);
+    padding-bottom: var(--spacing-xs);
+    border-bottom: 1px solid var(--border-primary);
+}
+
+.popup-name {
+    font-family: var(--font-bold);
+    font-size: var(--font-size-sm);
+    margin-bottom: 2px;
+}
+
+.popup-info {
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.popup-divider {
+    border-top: 1px solid var(--border-primary);
+    margin: var(--spacing-xs) 0;
+}
+
+.popup-option-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+    padding: 1px 0;
+}
+
+.popup-option-value {
+    font-family: var(--font-bold);
+}
+
+.popup-option-value.up {
+    color: var(--color-success);
+}
+
+.popup-option-value.down {
+    color: var(--color-error);
+}
+
+.popup-option-value.neutral {
+    color: var(--text-primary);
+}
+
+/* 팝업 액션 버튼 */
+.popup-actions {
+    display: flex;
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-sm);
+}
+
+.popup-actions .btn {
+    flex: 1;
+    font-size: var(--font-size-xs);
+    min-height: 28px;
+}
+
+/* 등급별 이름 색 */
+.popup-name.rarity-normal { color: var(--rarity-normal); }
+.popup-name.rarity-magic  { color: var(--rarity-magic); }
+.popup-name.rarity-rare   { color: var(--rarity-rare); }
+.popup-name.rarity-craft  { color: var(--rarity-craft); }
+.popup-name.rarity-unique { color: var(--rarity-unique); }

@@ -1,0 +1,153 @@
+/* ============================================
+   TheSevenRPG — Login Screen (레트로 RPG)
+   ============================================ */
+
+.login-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background: var(--bg-primary);
+    padding: var(--spacing-lg);
+    position: relative;
+}
+
+/* 스캔라인 배경 효과 */
+.login-screen::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.1) 2px,
+        rgba(0,0,0,0.1) 4px
+    );
+    pointer-events: none;
+}
+
+.login-title {
+    font-family: var(--font-bold);
+    font-size: 36px;
+    color: var(--text-accent);
+    margin-bottom: var(--spacing-sm);
+    text-shadow:
+        2px 2px 0 #600000,
+        4px 4px 0 #300000;
+    letter-spacing: 4px;
+    position: relative;
+}
+
+.login-subtitle {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+    margin-bottom: var(--spacing-xl);
+    letter-spacing: 2px;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-md);
+    width: 100%;
+    max-width: 320px;
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-secondary);
+    box-shadow: var(--rpg-border-outset);
+    padding: var(--spacing-xl) var(--spacing-lg);
+    position: relative;
+}
+
+.login-input {
+    width: 100%;
+    padding: 10px var(--spacing-md);
+    background: var(--bg-input);
+    border: 2px solid var(--border-primary);
+    box-shadow: var(--rpg-border-inset);
+    color: var(--text-primary);
+    font-family: var(--font-main);
+    font-size: var(--font-size-md);
+    text-align: center;
+    outline: none;
+}
+
+.login-input::placeholder {
+    color: var(--text-muted);
+}
+
+.login-input:focus {
+    border-color: var(--border-highlight);
+}
+
+/* 버튼 영역 (로그인 + 회원가입) */
+.login-buttons {
+    display: flex;
+    gap: var(--spacing-sm);
+    width: 100%;
+}
+
+.login-btn {
+    flex: 1;
+    padding: 12px;
+    background: var(--text-accent);
+    border: 2px solid #a02020;
+    box-shadow:
+        inset -2px -2px 0 0 #801818,
+        inset 2px 2px 0 0 #f06060;
+    color: #fff;
+    font-family: var(--font-bold);
+    font-size: var(--font-size-md);
+    cursor: pointer;
+    min-height: 44px;
+    letter-spacing: 2px;
+}
+
+.login-btn:hover {
+    background: #c82828;
+}
+
+.login-btn:active {
+    box-shadow:
+        inset 2px 2px 0 0 #801818,
+        inset -2px -2px 0 0 #f06060;
+}
+
+.login-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* 회원가입 버튼 (서브 스타일) */
+.login-btn-sub {
+    background: var(--bg-card);
+    border: 2px solid var(--border-secondary);
+    box-shadow:
+        inset -2px -2px 0 0 var(--border-dark),
+        inset 2px 2px 0 0 var(--border-highlight);
+    color: var(--text-primary);
+    font-size: var(--font-size-sm);
+    letter-spacing: 1px;
+}
+
+.login-btn-sub:hover {
+    background: var(--bg-tertiary);
+}
+
+.login-btn-sub:active {
+    box-shadow:
+        inset 2px 2px 0 0 var(--border-dark),
+        inset -2px -2px 0 0 var(--border-highlight);
+}
+
+.login-error {
+    color: var(--color-error);
+    font-size: var(--font-size-xs);
+    min-height: 16px;
+    text-align: center;
+}

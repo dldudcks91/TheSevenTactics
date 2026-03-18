@@ -1,0 +1,22 @@
+{
+    "name": "TheSevenTactics — 7대 죄악 웹 RPG",
+    "short_name": "TheSevenTactics",
+    "description": "7대 죄악 세계관 기반 웹 RPG — 영웅 육성, 파티 전투, 스킬트리",
+    "start_url": "/",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#0f0f0f",
+    "theme_color": "#c62828",
+    "icons": [
+        {
+            "src": "assets/icons/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "assets/icons/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}

@@ -1,0 +1,93 @@
+/* ============================================
+   TheSevenRPG — CSS Variables
+   레트로 도트 RPG 스타일 테마
+   ============================================ */
+
+:root {
+    /* === 죄종 테마 컬러 (레트로 채도 높은 팔레트) === */
+    --color-wrath: #e03030;       /* 1장 분노 */
+    --color-envy: #30b050;        /* 2장 시기 */
+    --color-greed: #d0a020;       /* 3장 탐욕 */
+    --color-sloth: #808898;       /* 4장 나태 */
+    --color-gluttony: #e07020;    /* 5장 폭식 */
+    --color-lust: #e03080;        /* 6장 색욕 */
+    --color-pride: #8040e0;       /* 7장 오만 */
+
+    /* === 아이템 등급 컬러 (레트로 RPG 팔레트) === */
+    --rarity-normal: #a0a0a0;     /* 일반 — 회색 */
+    --rarity-magic: #40a0f8;      /* 매직 — 밝은 파랑 */
+    --rarity-rare: #f8d830;       /* 레어 — 밝은 노랑 */
+    --rarity-craft: #40d870;      /* 제작 — 밝은 초록 */
+    --rarity-unique: #c060f8;     /* 유니크 — 밝은 보라 */
+
+    /* === 다크 테마 기본색 (CRT 느낌) === */
+    --bg-primary: #0a0a12;
+    --bg-secondary: #12121e;
+    --bg-tertiary: #1a1a2a;
+    --bg-card: #161624;
+    --bg-input: #0e0e1a;
+
+    /* === 픽셀 보더 (RPG 메뉴 스타일) === */
+    --border-primary: #303048;
+    --border-secondary: #484868;
+    --border-highlight: #6868a0;
+    --border-light: #a0a0c0;      /* 밝은 보더 (inset 효과) */
+    --border-dark: #18182a;       /* 어두운 보더 (inset 효과) */
+
+    --text-primary: #e8e8f0;
+    --text-secondary: #a0a0c0;
+    --text-muted: #606080;
+    --text-accent: #e03030;
+
+    /* === 상태 컬러 === */
+    --color-success: #40d870;
+    --color-warning: #f8b830;
+    --color-error: #f04040;
+    --color-info: #40a0f8;
+
+    /* === HP/EXP 바 (픽셀 스타일) === */
+    --hp-bar: #e83030;
+    --hp-bar-bg: #3a1018;
+    --exp-bar: #f8c830;
+    --exp-bar-bg: #3a3018;
+    --cost-bar: #4088f8;
+    --cost-bar-bg: #182a3a;
+
+    /* === 간격 (4px 그리드 — 픽셀 정렬) === */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 12px;
+    --spacing-lg: 16px;
+    --spacing-xl: 24px;
+
+    /* === 픽셀 폰트 === */
+    --font-main: 'Galmuri11', 'Galmuri9', monospace;
+    --font-bold: 'Galmuri11 Bold', 'Galmuri11', monospace;
+    --font-mono: 'Galmuri9', 'Galmuri11', monospace;
+    --font-size-xs: 9px;
+    --font-size-sm: 11px;
+    --font-size-md: 14px;
+    --font-size-lg: 16px;
+    --font-size-xl: 20px;
+    --font-size-xxl: 28px;
+
+    /* === 모서리: 없음 (픽셀 = 각진 모서리) === */
+    --radius-sm: 0px;
+    --radius-md: 0px;
+    --radius-lg: 0px;
+    --radius-full: 0px;
+
+    /* === 트랜지션: 최소화 (레트로 느낌) === */
+    --transition-fast: 0s;
+    --transition-normal: 0s;
+
+    /* === RPG 윈도우 보더 (inset/outset 3D 효과) === */
+    --rpg-border-outset:
+        inset -2px -2px 0 0 var(--border-dark),
+        inset 2px 2px 0 0 var(--border-highlight),
+        0 0 0 2px var(--border-primary);
+    --rpg-border-inset:
+        inset 2px 2px 0 0 var(--border-dark),
+        inset -2px -2px 0 0 var(--border-highlight),
+        0 0 0 2px var(--border-primary);
+}

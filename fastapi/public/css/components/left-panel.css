@@ -1,0 +1,78 @@
+/* ============================================
+   TheSevenRPG — Left Panel (좌측 패널 5탭)
+   ============================================ */
+
+.left-panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--bg-primary);
+    border-right: 2px solid var(--border-secondary);
+}
+
+/* 탭 바 */
+.left-panel-tabs {
+    display: flex;
+    background: var(--bg-secondary);
+    border-bottom: 2px solid var(--border-secondary);
+    flex-shrink: 0;
+}
+
+.lp-tab {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: var(--spacing-xs) 0;
+    background: var(--bg-card);
+    border: none;
+    border-right: 1px solid var(--border-primary);
+    color: var(--text-muted);
+    font-family: var(--font-main);
+    cursor: pointer;
+    min-height: 44px;
+}
+
+.lp-tab:last-child {
+    border-right: none;
+}
+
+.lp-tab.active {
+    color: var(--text-primary);
+    background: var(--bg-tertiary);
+    border-bottom: 2px solid var(--text-accent);
+}
+
+.lp-tab:hover:not(.active) {
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+}
+
+.lp-tab-icon {
+    font-size: 16px;
+    line-height: 1;
+}
+
+.lp-tab-label {
+    font-size: 9px;
+}
+
+/* 탭 내용 영역 */
+.left-panel-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--spacing-sm);
+}
+
+/* 준비 중 플레이스홀더 */
+.lp-tab-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
+    border: 2px dashed var(--border-primary);
+}

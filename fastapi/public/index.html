@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#c62828">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="description" content="TheSevenTactics — 7대 죄악 웹 RPG">
+    <title>TheSevenTactics — 7대 죄악</title>
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+
+    <!-- Pixel Font: Galmuri11 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/galmuri/dist/galmuri.css">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/components/login.css">
+    <link rel="stylesheet" href="css/components/top-bar.css">
+    <link rel="stylesheet" href="css/components/left-panel.css">
+    <link rel="stylesheet" href="css/components/popup.css">
+    <link rel="stylesheet" href="css/components/town-view.css">
+
+    <!-- Phaser.js (전투 연출용, CDN) -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js" defer></script>
+</head>
+<body>
+
+    <!-- SPA 앱 컨테이너 -->
+    <div id="app"></div>
+
+    <!-- 토스트 알림 컨테이너 -->
+    <div id="toast-container"></div>
+
+    <!-- 로딩 오버레이 -->
+    <div id="loading-overlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- 앱 엔트리: ES Module 단일 진입점 -->
+    <script type="module" src="js/app.js"></script>
+
+</body>
+</html>
