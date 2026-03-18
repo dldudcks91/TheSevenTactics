@@ -1,0 +1,14 @@
+param_name,value,description
+visit_interval_minutes,60,영웅 방문 주기 (분)
+visit_duration_minutes,120,영웅 체류 시간 (분)
+grade_common_weight,50,일반 등급 확률 가중치
+grade_uncommon_weight,30,고급 등급 확률 가중치
+grade_rare_weight,15,희귀 등급 확률 가중치
+grade_legendary_weight,5,전설 등급 확률 가중치
+recruit_cost_common,500,일반 영입 비용 (골드)
+recruit_cost_uncommon,2000,고급 영입 비용
+recruit_cost_rare,8000,희귀 영입 비용
+recruit_cost_legendary,30000,전설 영입 비용
+faction_human_weight,40,인간 진영 확률
+faction_demon_weight,40,악마 진영 확률
+faction_celestial_weight,20,천상 진영 확률

@@ -1,0 +1,160 @@
+import logging
+from database import SessionLocal
+from models import User, Hero, Party
+from services.system.ErrorCode import ErrorCode, error_response
+
+logger = logging.getLogger("RPG_SERVER")
+
+
+class PartyManager:
+    """파티 편성/변경/조회 (API 6xxx)"""
+
+    @classmethod
+    async def get_party(cls, user_no: int, data: dict):
+        """API 6001: 파티 편성 조회"""
+        db = SessionLocal()
+        try:
+            party = db.query(Party).filter(Party.user_no == user_no).first()
+
+            if not party:
+                party = Party(user_no=user_no)
+                db.add(party)
+                db.commit()
+
+            # 슬롯별 영웅 정보 조회
+            slots = []
+            for slot_num, hero_uid in enumerate([party.slot_1, party.slot_2, party.slot_3], 1):
+                if hero_uid:
+                    hero = db.query(Hero).filter(
+                        Hero.hero_uid == hero_uid,
+                        Hero.user_no == user_no
+                    ).first()
+                    if hero:
+                        slots.append({
+                            "slot": slot_num,
+                            "hero_uid": hero.hero_uid,
+                            "hero_id": hero.hero_id,
+                            "grade": hero.grade,
+                            "faction": hero.faction,
+                            "level": hero.level,
+                        })
+                    else:
+                        slots.append({"slot": slot_num, "hero_uid": None})
+                else:
+                    slots.append({"slot": slot_num, "hero_uid": None})
+
+            # 시너지 계산
+            factions = [s.get("faction") for s in slots if s.get("faction")]
+            synergy = cls._calc_synergy(factions)
+
+            return {
+                "success": True,
+                "message": "파티 조회",
+                "data": {
+                    "slots": slots,
+                    "synergy": synergy,
+                },
+            }
+        except Exception as e:
+            logger.error(f"[PartyManager] get_party 실패: {e}", exc_info=True)
+            return error_response(ErrorCode.DB_ERROR, "파티 조회 중 오류가 발생했습니다.")
+        finally:
+            db.close()
+
+    @classmethod
+    async def set_party(cls, user_no: int, data: dict):
+        """API 6002: 파티 편성 변경"""
+        slot_2 = data.get("slot_2")  # hero_uid or None
+        slot_3 = data.get("slot_3")  # hero_uid or None
+
+        db = SessionLocal()
+        try:
+            # 바알(본캐)의 hero_uid 조회 — 슬롯1은 항상 바알
+            baal = db.query(Hero).filter(
+                Hero.user_no == user_no,
+                Hero.hero_id == "baal"
+            ).first()
+
+            baal_uid = baal.hero_uid if baal else None
+
+            # 슬롯2, 3 영웅 소유권 확인
+            for uid in [slot_2, slot_3]:
+                if uid is not None:
+                    hero = db.query(Hero).filter(
+                        Hero.hero_uid == uid,
+                        Hero.user_no == user_no
+                    ).first()
+                    if not hero:
+                        return error_response(ErrorCode.ITEM_NOT_FOUND, f"영웅(uid={uid})을 찾을 수 없습니다.")
+                    if hero.hero_id == "baal":
+                        return error_response(ErrorCode.INVALID_REQUEST, "바알은 슬롯 1에 고정됩니다.")
+
+            # 중복 확인
+            if slot_2 and slot_3 and slot_2 == slot_3:
+                return error_response(ErrorCode.INVALID_REQUEST, "같은 영웅을 중복 배치할 수 없습니다.")
+
+            # 파티 업데이트
+            party = db.query(Party).filter(Party.user_no == user_no).first()
+            if not party:
+                party = Party(user_no=user_no)
+                db.add(party)
+
+            party.slot_1 = baal_uid
+            party.slot_2 = slot_2
+            party.slot_3 = slot_3
+            db.commit()
+
+            logger.info(f"[PartyManager] 파티 변경 (user={user_no}, slots=[{baal_uid},{slot_2},{slot_3}])")
+
+            return {
+                "success": True,
+                "message": "파티가 편성되었습니다.",
+                "data": {
+                    "slot_1": baal_uid,
+                    "slot_2": slot_2,
+                    "slot_3": slot_3,
+                },
+            }
+        except Exception as e:
+            db.rollback()
+            logger.error(f"[PartyManager] set_party 실패: {e}", exc_info=True)
+            return error_response(ErrorCode.DB_ERROR, "파티 편성 중 오류가 발생했습니다.")
+        finally:
+            db.close()
+
+    # ── 헬퍼 ──
+
+    @staticmethod
+    def _calc_synergy(factions: list) -> dict:
+        """진영 시너지 계산"""
+        if len(factions) < 2:
+            return {"name": None, "bonus": None}
+
+        from collections import Counter
+        counts = Counter(factions)
+
+        # 3동진영
+        for faction, count in counts.items():
+            if count >= 3:
+                bonuses = {
+                    "human": {"name": "인간의 결속", "bonus": "전 스탯 +10%"},
+                    "demon": {"name": "지옥의 서약", "bonus": "공격력 +15%"},
+                    "celestial": {"name": "천상의 축복", "bonus": "받는 데미지 -15%"},
+                }
+                return bonuses.get(faction, {"name": None, "bonus": None})
+
+        # 3종 혼합
+        if len(counts) == 3:
+            return {"name": "균형의 힘", "bonus": "전 스탯 +5%, 골드 +20%"}
+
+        # 2종 조합
+        if len(counts) == 2:
+            pair = tuple(sorted(counts.keys()))
+            pair_bonuses = {
+                ("demon", "human"): {"name": "타락한 동맹", "bonus": "치명타 +10%"},
+                ("celestial", "demon"): {"name": "천지의 갈등", "bonus": "스킬 데미지 +10%"},
+                ("celestial", "human"): {"name": "신의 은총", "bonus": "HP 회복 +15%"},
+            }
+            return pair_bonuses.get(pair, {"name": None, "bonus": None})
+
+        return {"name": None, "bonus": None}

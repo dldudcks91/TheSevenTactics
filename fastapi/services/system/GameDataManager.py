@@ -20,8 +20,12 @@ class GameDataManager:
         'uniques': [],
         'chapters': {},
         'stages': {},
-        'level_config': {},          # 레벨별 필요 XP + 보상 (CSV 미존재 시 BattleManager 폴백)
-        'spawn_grade_config': {},    # 스폰 등급별 배율 (CSV 미존재 시 BattleManager 폴백)
+        'level_config': {},
+        'spawn_grade_config': {},
+        # TheSevenTactics 신규
+        'hero_bases': {},            # hero_id → {hero_name, faction, base_stats, passive, active}
+        'skill_trees': {},           # tree_id → [{skill_id, skill_name, ...}, ...]
+        'tavern_config': {},         # param_name → {value, description}
     }
 
     def __new__(cls):
@@ -143,6 +147,23 @@ class GameDataManager:
                     "exp_mult": float(row["exp_mult"]),
                     "gold_mult": float(row["gold_mult"]),
                 }
+
+            # === TheSevenTactics 신규 CSV ===
+
+            # 13. Hero Base
+            for row in cls._read_csv(os.path.join(base_path, "hero_base.csv")):
+                cls.REQUIRE_CONFIGS['hero_bases'][row["hero_id"]] = row
+
+            # 14. Skill Tree
+            for row in cls._read_csv(os.path.join(base_path, "skill_tree.csv")):
+                tree_id = row["tree_id"]
+                if tree_id not in cls.REQUIRE_CONFIGS['skill_trees']:
+                    cls.REQUIRE_CONFIGS['skill_trees'][tree_id] = []
+                cls.REQUIRE_CONFIGS['skill_trees'][tree_id].append(row)
+
+            # 15. Tavern Config
+            for row in cls._read_csv(os.path.join(base_path, "tavern_config.csv")):
+                cls.REQUIRE_CONFIGS['tavern_config'][row["param_name"]] = row
 
             cls._loaded = True
             logger.info("=== Game CSV Data Load Complete ===")

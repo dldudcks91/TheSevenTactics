@@ -41,6 +41,15 @@ class ErrorCode(str, Enum):
     INVALID_BATTLE_REQ  = "E4002"   # 잘못된 전투 요청
     STAGE_NOT_UNLOCKED  = "E4003"   # 스테이지 미해금
 
+    # ── E5xxx: 영웅 ──────────────────────────────────────
+    HERO_NOT_FOUND      = "E5001"   # 영웅 없음
+    HERO_ALREADY_OWNED  = "E5002"   # 이미 보유한 영웅
+    SKILL_POINT_LACK    = "E5003"   # 스킬 포인트 부족
+
+    # ── E6xxx: 선술집/파티 ────────────────────────────────
+    TAVERN_EMPTY        = "E6001"   # 선술집에 영웅 없음
+    PARTY_INVALID       = "E6002"   # 잘못된 파티 구성
+
     # ── E9xxx: 서버 내부 ─────────────────────────────────
     DB_ERROR            = "E9001"   # DB 오류
     REDIS_ERROR         = "E9002"   # Redis 오류
