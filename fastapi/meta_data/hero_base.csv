@@ -15,3 +15,15 @@ legion,레기온,human,14,5,12,10,5,passive_legion,천의 목소리,적 수 많�
 banshee,밴시,human,5,12,8,10,12,passive_banshee,파멸의 울음,아군 사망 시 적 전체 방어력 -15%,active_banshee,파멸의 울음,적 전체 방어력 -30% + 아군 HP 30% 회복
 seraphim,세라핌,celestial,10,12,10,10,12,passive_seraphim,타락한 불꽃,화염 데미지 +25%,active_seraphim,정화의 불꽃,적 전체 INT 200% 화염 + 아군 상태이상 해제
 metatron,메타트론,celestial,5,15,5,12,18,passive_metatron,기록자의 눈,적 능력치 공개 + 약점 데미지 +10%,active_metatron,심판의 기록,적 단일 최대HP 비례 30% 데미지
+abadon,아바돈,demon,16,3,10,12,4,passive_abadon,파괴의 광기,공격 시 10% 확률 적 방어력 무시,active_abadon,파괴의 질주,적 단일 STR 280% + 방어력 50% 무시
+dullahan,둘라한,human,13,3,8,14,8,passive_dullahan,머리 없는 기사,사망 시 1턴 추가 행동,active_dullahan,망자의 일격,적 단일 STR 220% + 자신 HP 비례 추가 데미지
+samael,사마엘,demon,10,10,14,8,5,passive_samael,독의 지배,공격 시 30% 확률 독 부여 (턴당 5% HP),active_samael,맹독,적 전체 3턴 독 (턴당 8% HP)
+abyzou,아비주,demon,5,14,8,10,10,passive_abyzou,불모의 저주,적 회복 효과 50% 감소,active_abyzou,약탈의 손길,적 전체 INT 180% + 버프 1개 흡수
+dagon,다곤,human,8,5,5,18,10,passive_dagon,모래의 수호,아군 전원 방어력 +10%,active_dagon,대지의 벽,아군 전원 방어력 +30% 3턴
+charon,카론,human,5,10,5,12,15,passive_charon,뱃사공의 인도,아군 사망 시 HP 20%로 1회 부활,active_charon,스틱스의 뱃삯,사망 아군 1명 부활 HP 30%
+yukionna,유키온나,human,5,14,10,8,10,passive_yukionna,눈의 여인,공격 시 15% 확률 동결 2턴,active_yukionna,설화,적 전체 INT 180% + 동결 확률 40%
+pazuzu,파주주,demon,10,5,8,16,8,passive_pazuzu,얼어붙은 바람,사망 시 부활 HP 50% + 3턴 무적,active_pazuzu,한파,적 전체 행동력 -40% + 동결 확률 25%
+incubus,인큐버스,demon,12,10,14,5,5,passive_incubus,유혹의 왕자,매혹된 적 추가 데미지 +30%,active_incubus,지배,적 1체 매혹 2턴 + 공격력 20% 흡수
+lilith,릴리스,demon,5,16,10,8,8,passive_lilith,밤의 여왕,야간 전투 시 전 스탯 +15%,active_lilith,암흑의 포옹,적 전체 INT 200% + 실명 2턴
+siren,사이렌,human,5,12,12,8,10,passive_siren,파멸의 노래,전투 시작 시 적 전체 행동력 -10%,active_siren,매혹의 노래,적 전체 2턴 혼란 + 아군 행동력 +20%
+nephilim,네피림,celestial,16,5,5,14,8,passive_nephilim,거인의 후예,HP 비례 공격력 보정 (HP 1%당 +0.5%),active_nephilim,대지의 일격,적 전체 STR 200% + 기절 1턴

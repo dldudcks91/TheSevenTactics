@@ -59,7 +59,7 @@ class Item(Base):
     item_uid = Column(String(36), primary_key=True)
     user_no = Column(Integer, ForeignKey("users.user_no"), index=True)
 
-    base_item_id = Column(Integer, nullable=False)
+    base_item_id = Column(String(50), nullable=False)
     item_level = Column(Integer, default=1)
     rarity = Column(String(20), default="common")
     item_score = Column(Integer, default=0)
@@ -135,3 +135,6 @@ class Tavern(Base):
     active_id = Column(String(50), nullable=True)
     arrived_at = Column(DateTime, nullable=True)
     expires_at = Column(DateTime, nullable=True)
+
+    # 관계 설정
+    user = relationship("User", back_populates="tavern")

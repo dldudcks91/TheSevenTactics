@@ -26,6 +26,7 @@ class GameDataManager:
         'hero_bases': {},            # hero_id → {hero_name, faction, base_stats, passive, active}
         'skill_trees': {},           # tree_id → [{skill_id, skill_name, ...}, ...]
         'tavern_config': {},         # param_name → {value, description}
+        'equip_base_map': {},        # equip_id → {equip_name, equip_slot, base_stat, base_value, ...}
     }
 
     def __new__(cls):
@@ -164,6 +165,10 @@ class GameDataManager:
             # 15. Tavern Config
             for row in cls._read_csv(os.path.join(base_path, "tavern_config.csv")):
                 cls.REQUIRE_CONFIGS['tavern_config'][row["param_name"]] = row
+
+            # 16. Equipment Base Map (TheSevenTactics)
+            for row in cls._read_csv(os.path.join(base_path, "equipment_base.csv")):
+                cls.REQUIRE_CONFIGS['equip_base_map'][row["equip_id"]] = row
 
             cls._loaded = True
             logger.info("=== Game CSV Data Load Complete ===")

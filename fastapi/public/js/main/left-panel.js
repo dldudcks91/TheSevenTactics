@@ -5,13 +5,15 @@
 import StatTab from './tabs/stat.js';
 import HeroTab from './tabs/hero.js';
 import PartyTab from './tabs/party.js';
+import EquipTab from './tabs/equip.js';
+import SkillTab from './tabs/skill.js';
 
 const TABS = [
     { id: 'stat', icon: '📊', label: '스탯', module: StatTab },
     { id: 'hero', icon: '⚔️', label: '영웅', module: HeroTab },
     { id: 'party', icon: '👥', label: '파티', module: PartyTab },
-    { id: 'equip', icon: '🛡️', label: '장비', module: null },
-    { id: 'skill', icon: '🔮', label: '스킬', module: null },
+    { id: 'equip', icon: '🛡️', label: '장비', module: EquipTab },
+    { id: 'skill', icon: '🔮', label: '스킬', module: SkillTab },
 ];
 
 const LeftPanel = {

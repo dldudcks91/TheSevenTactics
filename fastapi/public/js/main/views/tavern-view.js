@@ -36,7 +36,8 @@ const TavernView = {
         const gc = GRADE_CLASS[d.grade] || '';
         this.el.innerHTML = `
             <div class="tavern-view">
-                <div class="tavern-panel">
+                <div class="tavern-panel" style="position:relative">
+                    <button class="close-x" data-action="back">✕</button>
                     <div class="tavern-title">선술집</div>
                     <div class="tavern-hero-name ${gc}">${d.hero_name || d.hero_id}</div>
                     <div class="tavern-hero-meta">${d.grade} · ${d.faction}</div>
@@ -67,6 +68,8 @@ const TavernView = {
                     showToast(res.message, 'info');
                     await this._load();
                 }
+            } else if (action === 'back') {
+                import('../../main.js').then(m => m.default.switchRightView('town'));
             }
         };
     },

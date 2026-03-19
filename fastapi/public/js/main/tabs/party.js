@@ -56,7 +56,8 @@ const PartyTab = {
         }
 
         if (this._pickingSlot) {
-            html += `<div class="party-hero-picker">
+            html += `<div class="party-hero-picker" style="position:relative">
+                <button class="close-x" data-action="close-picker" style="top:-2px;right:-2px;width:22px;height:22px;font-size:11px">✕</button>
                 <div class="party-picker-title">슬롯 ${this._pickingSlot}에 배치할 영웅 선택</div>
                 <div class="party-picker-item" data-action="clear-slot">비우기</div>`;
             for (const h of this._heroes) {
@@ -82,6 +83,8 @@ const PartyTab = {
             if (assign) { this._assign(parseInt(assign.dataset.uid)); return; }
             const clear = e.target.closest('[data-action="clear-slot"]');
             if (clear) { this._assign(null); return; }
+            const closePicker = e.target.closest('[data-action="close-picker"]');
+            if (closePicker) { this._pickingSlot = null; this._render(); return; }
         };
     },
 

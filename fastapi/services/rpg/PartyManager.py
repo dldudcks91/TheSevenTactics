@@ -1,6 +1,7 @@
 import logging
 from database import SessionLocal
 from models import User, Hero, Party
+from services.system.GameDataManager import GameDataManager
 from services.system.ErrorCode import ErrorCode, error_response
 
 logger = logging.getLogger("RPG_SERVER")
@@ -22,7 +23,9 @@ class PartyManager:
                 db.commit()
 
             # 슬롯별 영웅 정보 조회
+            hero_bases = GameDataManager.REQUIRE_CONFIGS.get("hero_bases", {})
             slots = []
+            slot_infos = {}
             for slot_num, hero_uid in enumerate([party.slot_1, party.slot_2, party.slot_3], 1):
                 if hero_uid:
                     hero = db.query(Hero).filter(
@@ -30,18 +33,24 @@ class PartyManager:
                         Hero.user_no == user_no
                     ).first()
                     if hero:
-                        slots.append({
+                        hb = hero_bases.get(hero.hero_id, {})
+                        info = {
                             "slot": slot_num,
                             "hero_uid": hero.hero_uid,
                             "hero_id": hero.hero_id,
+                            "hero_name": hb.get("hero_name", hero.hero_id),
                             "grade": hero.grade,
                             "faction": hero.faction,
                             "level": hero.level,
-                        })
+                        }
+                        slots.append(info)
+                        slot_infos[f"slot_{slot_num}_info"] = info
                     else:
                         slots.append({"slot": slot_num, "hero_uid": None})
+                        slot_infos[f"slot_{slot_num}_info"] = None
                 else:
                     slots.append({"slot": slot_num, "hero_uid": None})
+                    slot_infos[f"slot_{slot_num}_info"] = None
 
             # 시너지 계산
             factions = [s.get("faction") for s in slots if s.get("faction")]
@@ -53,6 +62,7 @@ class PartyManager:
                 "data": {
                     "slots": slots,
                     "synergy": synergy,
+                    **slot_infos,
                 },
             }
         except Exception as e:

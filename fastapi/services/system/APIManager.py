@@ -1,5 +1,5 @@
 from services.system import GameDataManager, UserInitManager, UserInfoManager
-from services.rpg import HeroManager, TavernManager, PartyManager, BattleManager
+from services.rpg import HeroManager, TavernManager, PartyManager, BattleManager, EquipmentManager
 
 
 class APIManager:
@@ -10,6 +10,11 @@ class APIManager:
         1004: (UserInfoManager, UserInfoManager.get_user_info),
         1005: (UserInfoManager, UserInfoManager.reset_stats),
         1007: (UserInitManager, UserInitManager.login),
+
+        # === 인벤토리/장비 API (2xxx) ===
+        2001: (EquipmentManager, EquipmentManager.get_inventory),
+        2002: (EquipmentManager, EquipmentManager.equip_item),
+        2003: (EquipmentManager, EquipmentManager.unequip_item),
 
         # === 전투 API (3xxx) ===
         3001: (BattleManager, BattleManager.battle_start),

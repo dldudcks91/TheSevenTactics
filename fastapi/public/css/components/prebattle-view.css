@@ -1,0 +1,61 @@
+/* TheSevenTactics — Pre-Battle View */
+
+.prebattle-view {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    height: 100%; padding: var(--spacing-lg);
+    background: var(--bg-primary);
+    gap: var(--spacing-md);
+}
+
+.pb-loading { color: var(--text-muted); font-size: var(--font-size-sm); }
+
+.pb-header { text-align: center; }
+.pb-stage-name {
+    font-family: var(--font-bold); font-size: var(--font-size-lg);
+    color: var(--text-accent); text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
+}
+.pb-chapter-name { font-size: var(--font-size-sm); color: var(--text-muted); }
+
+.pb-section-title {
+    font-family: var(--font-bold); font-size: var(--font-size-xs);
+    color: var(--color-warning); text-transform: uppercase; letter-spacing: 2px;
+}
+
+.pb-party {
+    display: flex; gap: var(--spacing-sm); width: 100%; max-width: 480px;
+}
+
+.pb-slot {
+    flex: 1; min-height: 80px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 4px; padding: var(--spacing-sm);
+    background: var(--bg-card); border: 2px solid var(--border-primary);
+}
+.pb-slot.filled { border-color: var(--color-info); }
+.pb-slot.empty { border-style: dashed; }
+
+.pb-slot-icon { font-size: 24px; }
+.pb-slot-info { text-align: center; }
+.pb-slot-name { font-family: var(--font-bold); font-size: var(--font-size-sm); }
+.pb-slot-meta { font-size: 9px; color: var(--text-muted); }
+.pb-slot-empty { font-size: var(--font-size-xs); color: var(--text-muted); }
+
+.pb-slot-name.grade-common { color: var(--rarity-normal); }
+.pb-slot-name.grade-uncommon { color: var(--rarity-magic); }
+.pb-slot-name.grade-rare { color: var(--rarity-rare); }
+.pb-slot-name.grade-legendary { color: var(--rarity-unique); }
+
+.pb-synergy {
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: rgba(248,200,48,0.08); border: 1px solid rgba(248,200,48,0.2);
+    font-size: var(--font-size-xs); color: var(--text-secondary);
+    text-align: center; width: 100%; max-width: 480px;
+}
+.pb-syn-label { font-family: var(--font-bold); color: var(--color-warning); }
+
+.pb-actions {
+    display: flex; gap: var(--spacing-sm); margin-top: var(--spacing-sm);
+}
+.pb-btn-go { min-width: 140px; min-height: 44px; font-size: var(--font-size-md); letter-spacing: 3px; }
+.pb-btn-back { min-width: 100px; }
