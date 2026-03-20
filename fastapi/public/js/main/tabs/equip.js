@@ -6,10 +6,9 @@ import { apiCall } from '../../api.js';
 import { showToast } from '../../utils.js';
 
 const SLOT_LABEL = {
-    weapon: '무기', armor: '갑옷', helmet: '투구',
-    boots: '신발', gloves: '장갑', accessory: '장신구',
+    weapon: '무기', armor: '갑옷', accessory: '장신구',
 };
-const SLOT_ORDER = ['weapon', 'armor', 'helmet', 'boots', 'gloves', 'accessory'];
+const SLOT_ORDER = ['weapon', 'armor', 'accessory'];
 const RARITY_CLASS = { common: 'rarity-common', magic: 'rarity-magic', rare: 'rarity-rare', unique: 'rarity-unique' };
 
 const EquipTab = {

@@ -51,7 +51,7 @@ class UserStat(Base):
     user = relationship("User", back_populates="stat")
 
 # ==========================================
-# 3. Item 테이블 (장비 아이템 — 6부위)
+# 3. Item 테이블 (장비 아이템 — 3부위: weapon/armor/accessory)
 # ==========================================
 class Item(Base):
     __tablename__ = "items"
@@ -68,7 +68,7 @@ class Item(Base):
     set_id = Column(String(50), nullable=True)
     dynamic_options = Column(JSON, nullable=True)
     is_equipped = Column(Boolean, default=False, index=True)
-    equip_slot = Column(String(20), nullable=True)  # weapon/armor/helmet/boots/gloves/accessory
+    equip_slot = Column(String(20), nullable=True)  # weapon/armor/accessory
     equipped_hero_uid = Column(Integer, ForeignKey("heroes.hero_uid"), nullable=True)
 
     # 관계 설정

@@ -6,7 +6,7 @@ from services.system.ErrorCode import ErrorCode, error_response
 
 logger = logging.getLogger("RPG_SERVER")
 
-EQUIP_SLOTS = {"weapon", "armor", "helmet", "boots", "gloves", "accessory"}
+EQUIP_SLOTS = {"weapon", "armor", "accessory"}
 
 
 class EquipmentManager:
