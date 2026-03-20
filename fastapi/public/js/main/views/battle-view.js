@@ -14,7 +14,6 @@ const C_HP_ALLY   = 0x30c050;   // 초록
 const C_HP_ENEMY  = 0xc03030;   // 빨강
 const C_GAUGE_BG  = 0x0a1018;
 const C_GAUGE     = 0xf0c030;   // 노랑 (행동 게이지)
-const C_SKILL_GAUGE = 0x6080f8; // 파랑 (스킬 게이지)
 const C_PORTRAIT_BG = 0x101020;
 const C_FRAME_ALLY = 0x4080c0;
 const C_FRAME_ENEMY = 0x903030;
@@ -227,29 +226,19 @@ const BattleView = {
         const gaugeGfx = sc.add.graphics();
         this._drawBar(gaugeGfx, barX, gaugeBarY, BAR_W, GAUGE_BAR_H, 0, C_GAUGE);
 
-        // ── 스킬 게이지 바 (행동 게이지 아래) ──
-        const skillBarY = gaugeBarY + GAUGE_BAR_H + 3;
-        const skillGfx = sc.add.graphics();
-        this._drawBar(skillGfx, barX, skillBarY, BAR_W, GAUGE_BAR_H, 0, C_SKILL_GAUGE);
-        // 스킬 라벨
-        const skillLabel = data.active_name
-            ? this._txt(sc, barX + BAR_W / 2, skillBarY - 1, data.active_name, '#8090c0', 7)
-            : null;
-
-        // ── 상태이상 아이콘 (스킬 게이지 아래) ──
+        // ── 상태이상 아이콘 (게이지 아래) ──
         const statusX = barX + BAR_W / 2;
-        const statusText = this._txt(sc, statusX, skillBarY + GAUGE_BAR_H + 8, '', '#fff', 10);
+        const statusText = this._txt(sc, statusX, gaugeBarY + GAUGE_BAR_H + 8, '', '#fff', 10);
 
         // 이동할 파츠 그룹
         const body = frameBg;  // 대표 오브젝트 (위치 참조용)
 
         return {
-            body, frameBg, portrait, sprite, nameText, hpGfx, hpLabel, gaugeGfx, skillGfx, skillLabel, statusText,
+            body, frameBg, portrait, sprite, nameText, hpGfx, hpLabel, gaugeGfx, statusText,
             x: portraitX, y: cy, barX,
-            hpBarY, gaugeBarY, skillBarY,
+            hpBarY, gaugeBarY,
             maxHp: data.max_hp, hp: data.max_hp,
             speed: data.speed || 10, gauge: 0,
-            skillGauge: 0, skillGaugeMax: data.skill_gauge_max || 12,
             isAlly, isBoss, faction: data.faction,
         };
     },
@@ -277,14 +266,10 @@ const BattleView = {
         this._drawBar(unit.gaugeGfx, unit.barX, unit.gaugeBarY, BAR_W, GAUGE_BAR_H,
             ratio, C_GAUGE);
     },
-    _updateSkillGauge(unit, ratio) {
-        this._drawBar(unit.skillGfx, unit.barX, unit.skillBarY, BAR_W, GAUGE_BAR_H,
-            ratio, C_SKILL_GAUGE);
-    },
 
     /* ── 이동 파츠 ─────────────────── */
     _moveParts(u) {
-        return [u.frameBg, u.portrait, u.sprite, u.nameText, u.hpGfx, u.hpLabel, u.gaugeGfx, u.skillGfx, u.skillLabel, u.statusText].filter(Boolean);
+        return [u.frameBg, u.portrait, u.sprite, u.nameText, u.hpGfx, u.hpLabel, u.gaugeGfx, u.statusText].filter(Boolean);
     },
 
     /* ════════════════════════════════════
@@ -322,9 +307,6 @@ const BattleView = {
                     if (u.hp <= 0) return;
                     u.gauge = Math.min(100, u.gauge + u.speed * inc * 0.08);
                     this._updateGauge(u, u.gauge / 100);
-                    // 스킬 게이지도 동시 충전
-                    u.skillGauge = Math.min(u.skillGaugeMax, u.skillGauge + u.speed * inc * 0.08);
-                    this._updateSkillGauge(u, u.skillGauge / u.skillGaugeMax);
                     if (actorUnit && u === actorUnit && u.gauge >= 100) ready = true;
                 });
                 if (!actorUnit) ready = true;
@@ -350,10 +332,6 @@ const BattleView = {
 
             switch (e.type) {
                 case 'attack': case 'skill':
-                    if (e.type === 'skill') {
-                        const su = units[e.actor];
-                        if (su) { su.skillGauge = 0; this._updateSkillGauge(su, 0); }
-                    }
                     this._animAttack(sc, units, e, e.type === 'skill', after); break;
                 case 'counter':
                     this._animCounter(sc, units, e, after); break;

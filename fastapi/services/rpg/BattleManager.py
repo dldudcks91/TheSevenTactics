@@ -13,8 +13,6 @@ logger = logging.getLogger("RPG_SERVER")
 BASE_ACTION_SPEED = 10       # 기본 행동 속도
 ACTION_PER_DEX = 0.3         # DEX당 행동 속도 보너스
 STATUS_TICK_DMG = 0.05       # 화상/독 틱 데미지 (최대HP%)
-# 스킬 타이머: 별도 게이지가 차면 다음 공격 시 스킬로 발동
-DEFAULT_SKILL_TIMER = 12.0   # 기본 스킬 발동 주기 (초=게이지 틱)
 
 # ── 진영 시너지 ──
 FACTION_SYNERGY = {
@@ -97,14 +95,13 @@ class BattleManager:
             ally_snap = [{
                 "name": u["name"], "max_hp": u["max_hp"], "side": "ally",
                 "speed": round(u.get("speed", 10), 1),
-                "skill_gauge_max": u.get("skill_gauge_max", DEFAULT_SKILL_TIMER),
+                "skills": [s["name"] for s in u.get("_skills", [])],
                 "faction": u.get("faction", "demon"), "grade": u.get("grade", "common"),
-                "hero_id": u.get("hero_id", ""), "active_name": u.get("active_name", ""),
+                "hero_id": u.get("hero_id", ""),
             } for u in allies]
             enemy_snap = [{
                 "name": u["name"], "max_hp": u["max_hp"], "side": "enemy",
                 "speed": round(u.get("speed", 10), 1),
-                "skill_gauge_max": u.get("skill_gauge_max", DEFAULT_SKILL_TIMER),
                 "is_boss": u.get("is_boss", False),
             } for u in enemies]
 
@@ -300,24 +297,18 @@ class BattleManager:
             final_atk = int(final_atk * 1.05)
             defense = int(defense * 1.05)
 
-        # 스킬 타이머 주기 (hero_base에 설정 가능, 없으면 기본값)
-        skill_timer_max = float(hero_base.get("skill_cooldown", DEFAULT_SKILL_TIMER))
-
         return {
             "name": hero_base.get("hero_name", hero.hero_id),
             "hero_id": hero.hero_id,
             "side": "ally",
             "faction": hero.faction,
             "grade": hero.grade,
-            "active_name": hero_base.get("active_name", ""),
-            "active_desc": hero_base.get("active_desc", ""),
             "hp": hp, "max_hp": hp,
             "atk": final_atk, "defense": defense,
             "speed": speed, "crit": crit,
             "action_gauge": 0, "alive": True,
-            # 스킬 타이머 (B안: 별도 게이지 충전 → 100% 도달 시 다음 공격에서 발동)
-            "skill_gauge": 0,
-            "skill_gauge_max": skill_timer_max,
+            # 멀티 스킬 (개별 쿨다운)
+            "_skills": cls._get_hero_skills(hero.hero_id),
             # 부가 효과
             "lifesteal": skill_bonus.get("lifesteal", 0),
             "counter_chance": skill_bonus.get("counter_chance", 0),
@@ -356,7 +347,7 @@ class BattleManager:
                     "atk": int(atk_base * ch_mult), "defense": int(5 * ch_mult),
                     "speed": 12 if is_boss else 10, "crit": 10 if is_boss else 5,
                     "action_gauge": 0, "alive": True,
-                    "skill_gauge": 0, "skill_gauge_max": DEFAULT_SKILL_TIMER,
+                    "_skills": [],
                     "lifesteal": 0, "counter_chance": 0,
                     "dmg_reduction": 0, "atk_stack": 0,
                     "_atk_stacked": 0, "_statuses": [],
@@ -379,7 +370,7 @@ class BattleManager:
             "defense": int(float(monster.get("base_def", 5)) * ch_mult),
             "speed": 10 + float(monster.get("atk_speed", 1.0)) * 3,
             "crit": 5, "action_gauge": 0, "alive": True,
-            "skill_gauge": 0, "skill_gauge_max": DEFAULT_SKILL_TIMER,
+            "_skills": [],
             "lifesteal": 0, "counter_chance": 0,
             "dmg_reduction": 0, "atk_stack": 0,
             "_atk_stacked": 0, "_statuses": [],
@@ -518,12 +509,10 @@ class BattleManager:
                     if not any(a["alive"] for a in allies):
                         return log, "defeat"
 
-            # ── 행동 게이지 + 스킬 게이지 동시 충전 ──
+            # ── 행동 게이지 충전 ──
             for u in all_units:
                 if u["alive"] and not u.get("_frozen_this_turn"):
                     u["action_gauge"] += u["speed"]
-                    # 스킬 게이지: 매 틱마다 speed 비례 충전
-                    u["skill_gauge"] = u.get("skill_gauge", 0) + u["speed"]
                 u["_frozen_this_turn"] = False
 
             actors = sorted(
@@ -549,21 +538,24 @@ class BattleManager:
 
                 target = min(targets, key=lambda t: t["hp"])
 
-                # ── 스킬 타이머 체크 (B안: 스킬 게이지 >= max 이면 발동) ──
+                # ── 멀티 스킬 쿨다운 체크 ──
+                # 모든 스킬의 쿨다운을 1 감소, 사용 가능한 첫 스킬 발동
                 used_skill = False
                 skill_name = ""
-                skill_gauge_max = actor.get("skill_gauge_max", DEFAULT_SKILL_TIMER)
+                skill_mult = 1.0
+                status_to_apply = None
 
-                if actor.get("skill_gauge", 0) >= skill_gauge_max and actor.get("active_name"):
-                    used_skill = True
-                    skill_name = actor["active_name"]
-                    actor["skill_gauge"] = 0  # 리셋
-                    skill_mult = 2.0
+                for sk in actor.get("_skills", []):
+                    sk["_cd_left"] = max(0, sk.get("_cd_left", 0) - 1)
 
-                    status_to_apply = cls._get_skill_status(actor.get("hero_id", ""))
-                else:
-                    skill_mult = 1.0
-                    status_to_apply = None
+                for sk in actor.get("_skills", []):
+                    if sk["_cd_left"] <= 0:
+                        used_skill = True
+                        skill_name = sk["name"]
+                        skill_mult = sk.get("mult", 2.0)
+                        status_to_apply = sk.get("status")
+                        sk["_cd_left"] = sk.get("cd", 3)  # 쿨다운 시작
+                        break  # 우선순위 높은 첫 스킬만 사용
 
                 # ── 누적 공격력 ──
                 stack = actor.get("atk_stack", 0)
@@ -664,19 +656,83 @@ class BattleManager:
 
         return log, "defeat"
 
-    @staticmethod
-    def _get_skill_status(hero_id):
-        """영웅별 액티브 스킬의 상태이상 부여 효과"""
-        table = {
-            "satan": {"type": "burn", "chance": 40, "turns": 3},
-            "moloch": {"type": "burn", "chance": 50, "turns": 3},
-            "seraphim": {"type": "burn", "chance": 35, "turns": 2},
-            "astaroth": {"type": "freeze", "chance": 30, "turns": 2},
-            "yukionna": {"type": "freeze", "chance": 40, "turns": 2},
-            "pazuzu": {"type": "freeze", "chance": 25, "turns": 2},
-            "asmodeus": {"type": "charm", "chance": 30, "turns": 2},
-            "incubus": {"type": "charm", "chance": 35, "turns": 2},
-            "samael": {"type": "poison", "chance": 40, "turns": 3},
-            "lilith": {"type": "poison", "chance": 30, "turns": 3},
-        }
-        return table.get(hero_id)
+    # ══════════════════════════════════════════════
+    # 영웅별 멀티 스킬 테이블
+    # 각 스킬: name, mult(데미지배율), cd(쿨다운 틱), status(상태이상)
+    # 우선순위: 리스트 앞이 높음 (쿨다운 된 것 중 첫 번째 사용)
+    # ══════════════════════════════════════════════
+    HERO_SKILLS = {
+        "baal": [
+            {"name": "마왕의 일격", "mult": 2.5, "cd": 5, "status": None},
+            {"name": "지옥의 파동", "mult": 1.8, "cd": 3, "status": {"type": "burn", "chance": 40, "turns": 2}},
+        ],
+        "satan": [
+            {"name": "분노의 질주", "mult": 2.2, "cd": 4, "status": {"type": "burn", "chance": 50, "turns": 3}},
+            {"name": "화염 베기", "mult": 1.5, "cd": 2, "status": None},
+        ],
+        "banshee": [
+            {"name": "파멸의 울음", "mult": 2.0, "cd": 4, "status": {"type": "freeze", "chance": 30, "turns": 2}},
+            {"name": "영혼 흡수", "mult": 1.4, "cd": 2, "status": None},
+        ],
+        "lucifer": [
+            {"name": "천상의 빛", "mult": 2.8, "cd": 6, "status": None},
+            {"name": "정화의 불꽃", "mult": 1.6, "cd": 3, "status": {"type": "burn", "chance": 35, "turns": 2}},
+            {"name": "축복", "mult": 1.0, "cd": 4, "status": None},  # TODO: 힐로 변경
+        ],
+        "leviathan": [
+            {"name": "심해의 분노", "mult": 2.3, "cd": 5, "status": {"type": "poison", "chance": 40, "turns": 3}},
+            {"name": "해류 강타", "mult": 1.5, "cd": 2, "status": None},
+        ],
+        "moloch": [
+            {"name": "용암 분출", "mult": 2.0, "cd": 4, "status": {"type": "burn", "chance": 50, "turns": 3}},
+            {"name": "화염 방패", "mult": 1.3, "cd": 3, "status": None},
+        ],
+        "astaroth": [
+            {"name": "빙결의 쇄도", "mult": 2.0, "cd": 4, "status": {"type": "freeze", "chance": 40, "turns": 2}},
+            {"name": "서리 일격", "mult": 1.4, "cd": 2, "status": None},
+        ],
+        "legion": [
+            {"name": "군단 돌격", "mult": 2.2, "cd": 5, "status": None},
+            {"name": "다중 베기", "mult": 1.6, "cd": 2, "status": None},
+        ],
+        "charon": [
+            {"name": "망자의 인도", "mult": 1.8, "cd": 4, "status": {"type": "poison", "chance": 30, "turns": 3}},
+            {"name": "노 휘두르기", "mult": 1.3, "cd": 2, "status": None},
+        ],
+        "seraphim": [
+            {"name": "성스러운 화염", "mult": 2.0, "cd": 4, "status": {"type": "burn", "chance": 35, "turns": 2}},
+            {"name": "날개 강타", "mult": 1.4, "cd": 2, "status": None},
+        ],
+        "samael": [
+            {"name": "죽음의 독", "mult": 2.2, "cd": 5, "status": {"type": "poison", "chance": 50, "turns": 3}},
+            {"name": "맹독 베기", "mult": 1.5, "cd": 2, "status": {"type": "poison", "chance": 20, "turns": 2}},
+        ],
+        "asmodeus": [
+            {"name": "매혹의 시선", "mult": 1.8, "cd": 5, "status": {"type": "charm", "chance": 40, "turns": 2}},
+            {"name": "유혹의 채찍", "mult": 1.5, "cd": 2, "status": None},
+        ],
+        "incubus": [
+            {"name": "매혹의 포옹", "mult": 1.6, "cd": 4, "status": {"type": "charm", "chance": 35, "turns": 2}},
+            {"name": "흡정", "mult": 1.3, "cd": 2, "status": None},
+        ],
+        "yukionna": [
+            {"name": "눈보라", "mult": 2.0, "cd": 4, "status": {"type": "freeze", "chance": 45, "turns": 2}},
+            {"name": "서리 손길", "mult": 1.3, "cd": 2, "status": {"type": "freeze", "chance": 15, "turns": 1}},
+        ],
+        "lilith": [
+            {"name": "타락의 속삭임", "mult": 2.0, "cd": 5, "status": {"type": "charm", "chance": 35, "turns": 2}},
+            {"name": "독의 입맞춤", "mult": 1.5, "cd": 3, "status": {"type": "poison", "chance": 30, "turns": 3}},
+        ],
+    }
+
+    @classmethod
+    def _get_hero_skills(cls, hero_id):
+        """영웅 ID → 스킬 리스트 (깊은 복사 + _cd_left 초기화)"""
+        import copy
+        base = cls.HERO_SKILLS.get(hero_id, [])
+        if not base:
+            return []
+        skills = copy.deepcopy(base)
+        for sk in skills:
+            sk["_cd_left"] = 0  # 쿨다운 남은 틱 (0이면 사용 가능)
+        return skills
