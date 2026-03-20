@@ -9,14 +9,12 @@ from services.rpg.ItemDropManager import ItemDropManager
 
 logger = logging.getLogger("RPG_SERVER")
 
-# ── 전투 상수 (RPG 공식 기반) ──
-BASE_ATK_PER_STR = 2         # STR당 물리 공격력
-BASE_MATK_PER_INT = 2        # INT당 마법 공격력
+# ── 전투 상수 (B안: 1스탯 1역할, 명중/회피 없음) ──
 BASE_ACTION_SPEED = 10       # 기본 행동 속도
 ACTION_PER_DEX = 0.3         # DEX당 행동 속도 보너스
-BASE_DEF_PER_VIT = 0.5       # VIT당 방어력
-ACTIVE_COOLDOWN = 4        # 액티브 스킬 쿨다운 (턴)
-STATUS_TICK_DMG = 0.05     # 화상/독 틱 데미지 (최대HP%)
+STATUS_TICK_DMG = 0.05       # 화상/독 틱 데미지 (최대HP%)
+# 스킬 타이머: 별도 게이지가 차면 다음 공격 시 스킬로 발동
+DEFAULT_SKILL_TIMER = 12.0   # 기본 스킬 발동 주기 (초=게이지 틱)
 
 # ── 진영 시너지 ──
 FACTION_SYNERGY = {
@@ -99,12 +97,14 @@ class BattleManager:
             ally_snap = [{
                 "name": u["name"], "max_hp": u["max_hp"], "side": "ally",
                 "speed": round(u.get("speed", 10), 1),
+                "skill_gauge_max": u.get("skill_gauge_max", DEFAULT_SKILL_TIMER),
                 "faction": u.get("faction", "demon"), "grade": u.get("grade", "common"),
                 "hero_id": u.get("hero_id", ""), "active_name": u.get("active_name", ""),
             } for u in allies]
             enemy_snap = [{
                 "name": u["name"], "max_hp": u["max_hp"], "side": "enemy",
                 "speed": round(u.get("speed", 10), 1),
+                "skill_gauge_max": u.get("skill_gauge_max", DEFAULT_SKILL_TIMER),
                 "is_boss": u.get("is_boss", False),
             } for u in enemies]
 
@@ -232,10 +232,12 @@ class BattleManager:
 
     @classmethod
     def _build_ally_unit(cls, hero, user_stat, equips=None):
+        """B안: 1스탯 1역할, 명중/회피 없음, 스킬 타이머 방식"""
         hero_base = GameDataManager.REQUIRE_CONFIGS.get("hero_bases", {}).get(hero.hero_id, {})
         equip_map = GameDataManager.REQUIRE_CONFIGS.get("equip_base_map", {})
         is_baal = hero.hero_id == "baal"
 
+        # ── 기본 스탯 결정 ──
         if is_baal:
             base_str, base_dex, base_vit, base_lck, base_int = (
                 user_stat.stat_str, user_stat.stat_dex,
@@ -255,33 +257,51 @@ class BattleManager:
         total_lck = base_lck + lv * 2
         total_int = base_int + lv * 2
 
-        equip_atk = equip_def = equip_dex = equip_int = 0
+        # ── 장비 보너스 (equipment_base CSV 기반) ──
+        equip_bonus = {"atk": 0, "def": 0, "hp": 0, "speed": 0, "crit": 0, "matk": 0}
         if equips:
             for item in equips:
                 base = equip_map.get(item.base_item_id, {})
-                v = int(base.get("base_value", 0))
-                st = base.get("base_stat", "")
-                if st == "atk": equip_atk += v
-                elif st == "def": equip_def += v
-                elif st == "dex": equip_dex += v
-                elif st == "int": equip_int += v
+                # 무기: min_damage~max_damage 평균 → atk
+                min_dmg = float(base.get("min_damage", 0))
+                max_dmg = float(base.get("max_damage", 0))
+                if min_dmg + max_dmg > 0:
+                    equip_bonus["atk"] += int((min_dmg + max_dmg) / 2)
+                # 방어구: base_defense
+                equip_bonus["def"] += int(float(base.get("base_defense", 0)))
 
+        # ── 스킬트리 보너스 ──
         skill_bonus = cls._calc_skill_tree_bonus(hero)
+
+        # ── 등급 배율 ──
         grade_mult = {"common": 1.0, "uncommon": 1.15, "rare": 1.3, "legendary": 1.5}
         mult = grade_mult.get(hero.grade, 1.0)
 
+        # ═══ B안 공식: 1스탯 = 1역할 ═══
+        # STR → 물리 공격력
+        atk = int((total_str * 2 + equip_bonus["atk"]) * (1 + total_str * 0.005) * mult
+                   * (1 + skill_bonus.get("atk_pct", 0) / 100))
+        # INT → 마법 공격력
+        matk = int((total_int * 2) * (1 + total_int * 0.005) * mult)
+        # VIT → HP + 방어력
         hp = int((100 + total_vit * 10) * mult * (1 + skill_bonus.get("hp_pct", 0) / 100))
-        atk = int((total_str * BASE_ATK_PER_STR + equip_atk) * (1 + total_str * 0.005) * mult * (1 + skill_bonus.get("atk_pct", 0) / 100))
-        matk = int(total_int * BASE_MATK_PER_INT * (1 + total_int * 0.005) * mult)
-        defense = int((total_vit * BASE_DEF_PER_VIT + equip_def) * mult * (1 + skill_bonus.get("def_pct", 0) / 100))
-        speed = BASE_ACTION_SPEED + (total_dex + equip_dex) * ACTION_PER_DEX
-        crit = (total_lck * 5 + skill_bonus.get("crit", 0)) * 0.001 * 100  # % 값
+        defense = int((total_vit * 0.5 + equip_bonus["def"]) * mult
+                       * (1 + skill_bonus.get("def_pct", 0) / 100))
+        # DEX → 공격속도 (행동 게이지 충전 속도)
+        speed = BASE_ACTION_SPEED + total_dex * ACTION_PER_DEX
+        # LCK → 치명타 확률 (%)
+        crit = min(80, total_lck * 0.5 + skill_bonus.get("crit", 0))
+
         final_atk = max(atk, matk)
 
+        # 바알 고유 패시브: 전 스탯 +5%
         if is_baal:
             hp = int(hp * 1.05)
             final_atk = int(final_atk * 1.05)
             defense = int(defense * 1.05)
+
+        # 스킬 타이머 주기 (hero_base에 설정 가능, 없으면 기본값)
+        skill_timer_max = float(hero_base.get("skill_cooldown", DEFAULT_SKILL_TIMER))
 
         return {
             "name": hero_base.get("hero_name", hero.hero_id),
@@ -293,16 +313,19 @@ class BattleManager:
             "active_desc": hero_base.get("active_desc", ""),
             "hp": hp, "max_hp": hp,
             "atk": final_atk, "defense": defense,
-            "speed": speed, "crit": min(crit, 80),
+            "speed": speed, "crit": crit,
             "action_gauge": 0, "alive": True,
+            # 스킬 타이머 (B안: 별도 게이지 충전 → 100% 도달 시 다음 공격에서 발동)
+            "skill_gauge": 0,
+            "skill_gauge_max": skill_timer_max,
+            # 부가 효과
             "lifesteal": skill_bonus.get("lifesteal", 0),
             "counter_chance": skill_bonus.get("counter_chance", 0),
             "dmg_reduction": skill_bonus.get("dmg_reduction", 0),
             "gold_bonus": skill_bonus.get("gold_bonus", 0),
             "atk_stack": skill_bonus.get("atk_stack", 0),
             "_atk_stacked": 0,
-            "_active_cd": 0,        # 액티브 쿨다운 카운터
-            "_statuses": [],         # [{"type": "burn"|"freeze"|"poison"|"charm", "turns": N}]
+            "_statuses": [],
         }
 
     @classmethod
@@ -333,9 +356,10 @@ class BattleManager:
                     "atk": int(atk_base * ch_mult), "defense": int(5 * ch_mult),
                     "speed": 12 if is_boss else 10, "crit": 10 if is_boss else 5,
                     "action_gauge": 0, "alive": True,
+                    "skill_gauge": 0, "skill_gauge_max": DEFAULT_SKILL_TIMER,
                     "lifesteal": 0, "counter_chance": 0,
                     "dmg_reduction": 0, "atk_stack": 0,
-                    "_atk_stacked": 0, "_active_cd": 0, "_statuses": [],
+                    "_atk_stacked": 0, "_statuses": [],
                     "_phase": 1,
                 })
 
@@ -355,9 +379,10 @@ class BattleManager:
             "defense": int(float(monster.get("base_def", 5)) * ch_mult),
             "speed": 10 + float(monster.get("atk_speed", 1.0)) * 3,
             "crit": 5, "action_gauge": 0, "alive": True,
+            "skill_gauge": 0, "skill_gauge_max": DEFAULT_SKILL_TIMER,
             "lifesteal": 0, "counter_chance": 0,
             "dmg_reduction": 0, "atk_stack": 0,
-            "_atk_stacked": 0, "_active_cd": 0, "_statuses": [],
+            "_atk_stacked": 0, "_statuses": [],
             "_phase": 1,
         }
 
@@ -493,11 +518,13 @@ class BattleManager:
                     if not any(a["alive"] for a in allies):
                         return log, "defeat"
 
-            # ── 행동 게이지 충전 ──
+            # ── 행동 게이지 + 스킬 게이지 동시 충전 ──
             for u in all_units:
                 if u["alive"] and not u.get("_frozen_this_turn"):
                     u["action_gauge"] += u["speed"]
-                u["_frozen_this_turn"] = False  # 리셋
+                    # 스킬 게이지: 매 틱마다 speed 비례 충전
+                    u["skill_gauge"] = u.get("skill_gauge", 0) + u["speed"]
+                u["_frozen_this_turn"] = False
 
             actors = sorted(
                 [u for u in all_units if u["alive"] and u["action_gauge"] >= 100],
@@ -522,18 +549,17 @@ class BattleManager:
 
                 target = min(targets, key=lambda t: t["hp"])
 
-                # ── 액티브 스킬 체크 ──
+                # ── 스킬 타이머 체크 (B안: 스킬 게이지 >= max 이면 발동) ──
                 used_skill = False
                 skill_name = ""
-                actor["_active_cd"] = max(0, actor.get("_active_cd", 0) - 1)
+                skill_gauge_max = actor.get("skill_gauge_max", DEFAULT_SKILL_TIMER)
 
-                if actor.get("_active_cd", 0) <= 0 and actor.get("active_name"):
+                if actor.get("skill_gauge", 0) >= skill_gauge_max and actor.get("active_name"):
                     used_skill = True
                     skill_name = actor["active_name"]
-                    actor["_active_cd"] = ACTIVE_COOLDOWN
-                    skill_mult = 2.0  # 액티브 = 기본 2배 데미지
+                    actor["skill_gauge"] = 0  # 리셋
+                    skill_mult = 2.0
 
-                    # 스킬 부가효과 (hero_id 기반)
                     status_to_apply = cls._get_skill_status(actor.get("hero_id", ""))
                 else:
                     skill_mult = 1.0

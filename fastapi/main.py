@@ -40,6 +40,7 @@ async def startup_event():
     await RedisManager.init()
     GameDataManager.load_all_csv(base_path="./meta_data/")
     database.init_db()
+    APIManager._init_map()
     logger.info("=== TheSevenTactics Server Ready ===")
 
 
