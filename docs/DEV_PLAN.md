@@ -186,29 +186,52 @@ API 코드 추가:
 
 ---
 
-## 미설계 항목 → 구현 완료
+## 기획 완료 항목
 
-- [x] 7죄종 스킬트리 상세 — skill_tree.csv에 effect_type/effect_base/effect_per_level 추가 (28스킬)
-- [x] 영웅 로스터 — hero_base.csv 28체 (demon 16 / human 7 / celestial 5)
-- [x] 3v3 전투 공식 — 스킬트리 패시브, 장비 보정, 진영 시너지, 흡혈/반격/피해감소/누적공격
-- [x] 선술집 상세 설정 — tavern_config.csv (방문주기/등급확률/비용 13개 파라미터)
-- [x] 영웅 레벨업/경험치 커브 — level_exp_table.csv (Lv1~50, 점진적 증가)
-- [x] 스킬트리 포인트 총량 — 영웅 레벨당 1포인트, 스킬별 cost_per_level로 제한
-- [x] 진영 시너지 상세 수치 — 3동진영/3혼합/2종조합 7가지 시너지 구현
-- [x] 바알(본캐) 고유 시스템 — UserStat 기반 스탯, 전투 시작 시 전 스탯 +5% 패시브
+- [x] 스탯 체계 확정: STR/DEX/VIT/LCK/INT (CST→INT 변경, 코스트 삭제)
+- [x] 바알 = 메인 캐릭터 (슬롯1 고정, UserStat 직접 투자)
+- [x] 장비 5부위: 무기/갑옷/투구/장갑/신발 (RPG 구조 이식)
+- [x] 카드 시스템 삭제 → 스킬트리 직접 투자 방식
+- [x] 전투 공식 이식: ATK × (1-DEF/(DEF+100)) × 사이즈 × 치명타
+- [x] 상태이상 7종 이식 (화상/중독/스턴/빙결/침식/매혹/심판)
+- [x] 몬스터 시스템 이식: 16베이스 × 3타입, 정예 특성, 사이즈 보정
+- [x] 드롭 시스템 이식: mlvl 기반, 등급별 확률, 타겟 파밍 3축
+- [x] 장비 등급/접사/세트 이식: 매직/레어/크래프트/유니크, 7죄종 세트 보너스
+- [x] 경험치/레벨 이식: Lv1~50, 지수 곡선, 사망 패널티 10%
+- [x] CSV 19개 이식: equipment, monster, stage, drop, spawn, elite, status 등
+
+## Phase 6: RPG 시스템 이식 (진행 중)
+
+```
+서버:
+□ models.py — 장비 5부위 전환 (Item 모델 수정)
+□ models.py — CST→INT 스탯 변경 (UserStat)
+□ models.py — Card/Collection 모델 삭제
+□ InventoryManager — 5부위 장착/해제 + 파티 지원
+□ ItemDropManager — mlvl 기반 드롭 생성 이식
+□ BattleManager — 드롭 연동 (전투 승리 시 아이템 지급)
+□ StatusEffectManager — 상태이상 7종 이식
+□ GameDataManager — 새 CSV 19개 로드
+
+클라이언트:
+□ 장비 탭 — 5부위 UI 전환
+□ 전투 결과 — 드롭 아이템 표시
+□ 인벤토리 화면 — 아이템 목록/상세/장착
+```
 
 ## 미구현 항목 (향후)
 
-- [ ] 아이템 드롭 시스템 (전투 승리 시 장비 드롭)
+- [ ] INT 스탯 세부 효과 확정 (마법 공격력, 스킬 증폭)
+- [ ] 스킬트리 상세 설계 (7트리 × N스킬, 수치 밸런싱)
+- [ ] 영웅 베이스 스탯 밸런싱 (hero_base.csv)
+- [ ] 장비 접사 수치 밸런싱 (ilvl/qlvl 체계)
+- [ ] 드롭 확률 테이블 세부 조정
+- [ ] 대장간 (크래프팅) 구현
 - [ ] 장비 강화/분해 시스템
-- [x] 챕터/스테이지 CSV (monster_info, stage_info, chapter_info)
-- [x] 장비 3슬롯 전환 (6부위 → weapon/armor/accessory)
-- [x] 직업 시스템 제거 → 역할 태그(공격/방어/지원/방해) 전환
-- [x] 영웅 28체 고유 스킬 확정 (hero_base.csv)
-- [ ] 아이템 드롭 CSV (drop_table.csv)
-- [ ] 길드/세력 시스템
 - [ ] PvP 투기장
 - [ ] 오프라인 훈련 (연옥)
+- [ ] 길드/세력 시스템
+- [ ] 퀘스트 게시판
 
 ---
 

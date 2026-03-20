@@ -26,7 +26,14 @@ class GameDataManager:
         'hero_bases': {},            # hero_id → {hero_name, faction, base_stats, passive, active}
         'skill_trees': {},           # tree_id → [{skill_id, skill_name, ...}, ...]
         'tavern_config': {},         # param_name → {value, description}
-        'equip_base_map': {},        # equip_id → {equip_name, equip_slot, base_stat, base_value, ...}
+        'equip_base_map': {},        # item_idx → {item_base, main_group, ...}
+        'suffixes': [],              # equipment_suffix.csv 전체
+        'common_options': [],        # equipment_common_option.csv 전체
+        'set_bonuses': {},           # sin → [{breakpoint, effect, ...}]
+        'status_effects': {},        # effect_id → {effect_korean, duration, ...}
+        'elite_traits': [],          # elite_trait.csv 전체
+        'equip_drop_rate': {},       # mlvl → {magic_pct, rare_pct, ...}
+        'gold_drop_config': {},      # grade → {base_gold, multiplier, ...}
     }
 
     def __new__(cls):
@@ -64,10 +71,10 @@ class GameDataManager:
             # 3. Drop Config
             for row in cls._read_csv(os.path.join(base_path, "monster_drop_config.csv")):
                 cls.REQUIRE_CONFIGS['drop_config'][int(row["monster_grade"])] = [
-                    ("Nodrop", int(row["Nodrop"])),
-                    ("gold", int(row["gold"])),
-                    ("equipment", int(row["equipment"])),
-                    ("etc", int(row["etc(Card/Mat)"]))
+                    ("Nodrop", int(float(row.get("Nodrop", 0)))),
+                    ("gold", int(float(row.get("gold", 0)))),
+                    ("equipment", int(float(row.get("equipment", 0)))),
+                    ("etc", int(float(row.get("etc", row.get("etc(Card/Mat)", 0)))))
                 ]
 
             # 4. Drop Equipment Weights (JSON 직렬화를 위해 튜플 대신 String Key 사용)
@@ -166,9 +173,39 @@ class GameDataManager:
             for row in cls._read_csv(os.path.join(base_path, "tavern_config.csv")):
                 cls.REQUIRE_CONFIGS['tavern_config'][row["param_name"]] = row
 
-            # 16. Equipment Base Map (TheSevenTactics)
+            # 16. Equipment Base Map (item_idx 기준 조회용)
             for row in cls._read_csv(os.path.join(base_path, "equipment_base.csv")):
-                cls.REQUIRE_CONFIGS['equip_base_map'][row["equip_id"]] = row
+                cls.REQUIRE_CONFIGS['equip_base_map'][row["item_idx"]] = row
+
+            # 17. Equipment Suffix
+            cls.REQUIRE_CONFIGS['suffixes'] = cls._read_csv(os.path.join(base_path, "equipment_suffix.csv"))
+
+            # 18. Equipment Common Option
+            cls.REQUIRE_CONFIGS['common_options'] = cls._read_csv(os.path.join(base_path, "equipment_common_option.csv"))
+
+            # 19. Equipment Set Bonus
+            for row in cls._read_csv(os.path.join(base_path, "equipment_set_bonus.csv")):
+                sin = row.get("sin") or row.get("set_id", "")
+                if sin not in cls.REQUIRE_CONFIGS.get('set_bonuses', {}):
+                    cls.REQUIRE_CONFIGS.setdefault('set_bonuses', {})[sin] = []
+                cls.REQUIRE_CONFIGS['set_bonuses'][sin].append(row)
+
+            # 20. Status Effect
+            for row in cls._read_csv(os.path.join(base_path, "status_effect.csv")):
+                cls.REQUIRE_CONFIGS.setdefault('status_effects', {})[row["effect_id"]] = row
+
+            # 21. Elite Trait
+            cls.REQUIRE_CONFIGS['elite_traits'] = cls._read_csv(os.path.join(base_path, "elite_trait.csv"))
+
+            # 22. Equip Drop Rate
+            for row in cls._read_csv(os.path.join(base_path, "equip_drop_rate.csv")):
+                mlvl = int(row.get("mlvl", row.get("monster_level", 0)))
+                cls.REQUIRE_CONFIGS.setdefault('equip_drop_rate', {})[mlvl] = row
+
+            # 23. Gold Drop Config
+            for row in cls._read_csv(os.path.join(base_path, "gold_drop_config.csv")):
+                grade = row.get("grade") or row.get("monster_grade", "")
+                cls.REQUIRE_CONFIGS.setdefault('gold_drop_config', {})[grade] = row
 
             cls._loaded = True
             logger.info("=== Game CSV Data Load Complete ===")

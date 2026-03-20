@@ -83,10 +83,10 @@ class HeroManager:
                     "exp": hero.exp,
                     "base_stats": {
                         "str": int(hero_base.get("base_str", 10)) if hero_base else 10,
-                        "int": int(hero_base.get("base_int", 10)) if hero_base else 10,
-                        "agi": int(hero_base.get("base_agi", 10)) if hero_base else 10,
+                        "dex": int(hero_base.get("base_dex", 10)) if hero_base else 10,
                         "vit": int(hero_base.get("base_vit", 10)) if hero_base else 10,
-                        "will": int(hero_base.get("base_will", 10)) if hero_base else 10,
+                        "lck": int(hero_base.get("base_lck", 10)) if hero_base else 10,
+                        "int": int(hero_base.get("base_int", 10)) if hero_base else 10,
                     },
                     "skill_tree_1": hero.skill_tree_1,
                     "skill_tree_2": hero.skill_tree_2,

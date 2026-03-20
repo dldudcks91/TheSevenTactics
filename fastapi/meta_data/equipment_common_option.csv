@@ -1,0 +1,71 @@
+option_id,option_name,option_korean,equipment_type,stat_type,min_value,max_value,weight
+w01,min_damage,최소 피해,weapon,fixed,1,30,100
+w02,max_damage,최대 피해,weapon,fixed,1,30,100
+w03,accuracy,명중률,weapon,fixed,5,100,80
+w04,str,힘,weapon,fixed,1,30,70
+w05,dex,민첩,weapon,fixed,1,30,70
+w06,vs_large_dmg,대형 추가 피해,weapon,fixed,5,50,50
+w07,vs_medium_dmg,중형 추가 피해,weapon,fixed,5,50,50
+w08,vs_small_dmg,소형 추가 피해,weapon,fixed,5,50,50
+w09,vs_normal_dmg,vs Normal 추가 피해,weapon,fixed,5,50,40
+w10,vs_demon_dmg,vs Demon 추가 피해,weapon,fixed,5,50,40
+w11,vs_undead_dmg,vs Undead 추가 피해,weapon,fixed,5,50,40
+w12,gold_find,골드 획득 증가,weapon,percentile,5,50,30
+w13,item_find,아이템 드랍 확률 증가,weapon,percentile,3,30,20
+w14,cost_reduction,코스트 감소,weapon,percentile,3,15,30
+a01,defense,방어력,armor,fixed,5,50,100
+a02,hp,체력,armor,fixed,10,100,100
+a03,evasion,회피율,armor,fixed,5,80,80
+a04,str,힘,armor,fixed,1,30,70
+a05,dex,민첩,armor,fixed,1,30,70
+a06,vs_large_dr,대형 피해 감소,armor,fixed,3,30,50
+a07,vs_medium_dr,중형 피해 감소,armor,fixed,3,30,50
+a08,vs_small_dr,소형 피해 감소,armor,fixed,3,30,50
+a09,vs_normal_dr,vs Normal 피해 감소,armor,fixed,3,30,40
+a10,vs_demon_dr,vs Demon 피해 감소,armor,fixed,3,30,40
+a11,vs_undead_dr,vs Undead 피해 감소,armor,fixed,3,30,40
+a12,gold_find,골드 획득 증가,armor,percentile,5,50,30
+a13,item_find,아이템 드랍 확률 증가,armor,percentile,3,30,20
+a14,cost_reduction,코스트 감소,armor,percentile,3,15,30
+h01,defense,방어력,helmet,fixed,5,50,100
+h02,hp,체력,helmet,fixed,10,100,100
+h03,evasion,회피율,helmet,fixed,5,80,80
+h04,str,힘,helmet,fixed,1,30,70
+h05,dex,민첩,helmet,fixed,1,30,70
+h06,vs_large_dr,대형 피해 감소,helmet,fixed,3,30,50
+h07,vs_medium_dr,중형 피해 감소,helmet,fixed,3,30,50
+h08,vs_small_dr,소형 피해 감소,helmet,fixed,3,30,50
+h09,vs_normal_dr,vs Normal 피해 감소,helmet,fixed,3,30,40
+h10,vs_demon_dr,vs Demon 피해 감소,helmet,fixed,3,30,40
+h11,vs_undead_dr,vs Undead 피해 감소,helmet,fixed,3,30,40
+h12,gold_find,골드 획득 증가,helmet,percentile,5,50,30
+h13,item_find,아이템 드랍 확률 증가,helmet,percentile,3,30,20
+h14,cost_reduction,코스트 감소,helmet,percentile,3,15,30
+g01,defense,방어력,gloves,fixed,3,30,100
+g02,hp,체력,gloves,fixed,5,60,100
+g03,evasion,회피율,gloves,fixed,3,50,80
+g04,str,힘,gloves,fixed,1,30,70
+g05,dex,민첩,gloves,fixed,1,30,70
+g06,vs_large_dr,대형 피해 감소,gloves,fixed,3,30,50
+g07,vs_medium_dr,중형 피해 감소,gloves,fixed,3,30,50
+g08,vs_small_dr,소형 피해 감소,gloves,fixed,3,30,50
+g09,vs_normal_dr,vs Normal 피해 감소,gloves,fixed,3,30,40
+g10,vs_demon_dr,vs Demon 피해 감소,gloves,fixed,3,30,40
+g11,vs_undead_dr,vs Undead 피해 감소,gloves,fixed,3,30,40
+g12,gold_find,골드 획득 증가,gloves,percentile,5,50,30
+g13,item_find,아이템 드랍 확률 증가,gloves,percentile,3,30,20
+g14,cost_reduction,코스트 감소,gloves,percentile,3,15,30
+b01,defense,방어력,boots,fixed,3,30,100
+b02,hp,체력,boots,fixed,5,60,100
+b03,evasion,회피율,boots,fixed,3,50,80
+b04,str,힘,boots,fixed,1,30,70
+b05,dex,민첩,boots,fixed,1,30,70
+b06,vs_large_dr,대형 피해 감소,boots,fixed,3,30,50
+b07,vs_medium_dr,중형 피해 감소,boots,fixed,3,30,50
+b08,vs_small_dr,소형 피해 감소,boots,fixed,3,30,50
+b09,vs_normal_dr,vs Normal 피해 감소,boots,fixed,3,30,40
+b10,vs_demon_dr,vs Demon 피해 감소,boots,fixed,3,30,40
+b11,vs_undead_dr,vs Undead 피해 감소,boots,fixed,3,30,40
+b12,gold_find,골드 획득 증가,boots,percentile,5,50,30
+b13,item_find,아이템 드랍 확률 증가,boots,percentile,3,30,20
+b14,cost_reduction,코스트 감소,boots,percentile,3,15,30

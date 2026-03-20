@@ -5,18 +5,16 @@ from database import SessionLocal
 from models import User, UserStat, Hero, Party, Item
 from services.system.GameDataManager import GameDataManager
 from services.system.ErrorCode import ErrorCode, error_response
+from services.rpg.ItemDropManager import ItemDropManager
 
 logger = logging.getLogger("RPG_SERVER")
 
-# ── 전투 상수 ──
-BASE_HP_PER_VIT = 5
-BASE_ATK_PER_STR = 2
-BASE_MATK_PER_INT = 2
-BASE_ACTION_SPEED = 10
-ACTION_PER_AGI = 0.3
-BASE_DEF_PER_VIT = 0.5
-CRIT_BASE = 5
-CRIT_PER_AGI = 0.5
+# ── 전투 상수 (RPG 공식 기반) ──
+BASE_ATK_PER_STR = 2         # STR당 물리 공격력
+BASE_MATK_PER_INT = 2        # INT당 마법 공격력
+BASE_ACTION_SPEED = 10       # 기본 행동 속도
+ACTION_PER_DEX = 0.3         # DEX당 행동 속도 보너스
+BASE_DEF_PER_VIT = 0.5       # VIT당 방어력
 ACTIVE_COOLDOWN = 4        # 액티브 스킬 쿨다운 (턴)
 STATUS_TICK_DMG = 0.05     # 화상/독 틱 데미지 (최대HP%)
 
@@ -125,11 +123,52 @@ class BattleManager:
             battle_log, result = cls._simulate_battle(allies, enemies)
 
             # 보상
-            rewards = {"exp": 0, "gold": 0}
+            rewards = {"exp": 0, "gold": 0, "items": []}
             gold_bonus = sum(u.get("gold_bonus", 0) for u in allies)
             if result == "victory":
-                rewards["exp"] = len(enemies) * 50 * chapter
-                rewards["gold"] = int(len(enemies) * 30 * chapter * (1 + gold_bonus / 100))
+                # 적 정보로 드롭 생성
+                dlvl = stage_meta.get("waves", {}).get(1, stage_id)
+                # dlvl 추정: chapter * 7 + stage_num * 2
+                dlvl = chapter * 7 + stage_num * 2
+                spawn_grade = "stage_boss" if is_boss_stage else "normal"
+                killed_monsters = [{
+                    "monster_idx": e.get("monster_idx", 0),
+                    "name": e.get("name", ""),
+                    "exp_reward": e.get("exp_reward", 50),
+                } for e in enemies]
+
+                drop_result = ItemDropManager.generate_drops(
+                    killed_monsters, dlvl, chapter, spawn_grade
+                )
+
+                rewards["exp"] = drop_result["exp"]
+                rewards["gold"] = int(drop_result["gold"] * (1 + gold_bonus / 100))
+
+                # 드롭 아이템을 DB에 저장
+                for item_data in drop_result["items"]:
+                    new_item = Item(
+                        item_uid=item_data["item_uid"],
+                        user_no=user_no,
+                        base_item_id=str(item_data["base_item_id"]),
+                        item_level=item_data["item_level"],
+                        rarity=item_data["rarity"],
+                        item_score=item_data["item_score"],
+                        prefix_id=item_data.get("prefix_id"),
+                        suffix_id=item_data.get("suffix_id"),
+                        set_id=item_data.get("set_id"),
+                        dynamic_options=item_data.get("dynamic_options"),
+                        equip_slot=item_data.get("equip_slot"),
+                    )
+                    db.add(new_item)
+                    rewards["items"].append({
+                        "item_uid": item_data["item_uid"],
+                        "item_name": item_data.get("item_name", ""),
+                        "main_group": item_data.get("main_group", ""),
+                        "rarity": item_data["rarity"],
+                        "item_level": item_data["item_level"],
+                        "prefix_id": item_data.get("prefix_id"),
+                        "suffix_id": item_data.get("suffix_id"),
+                    })
 
                 stat.exp += rewards["exp"]
                 user.gold += rewards["gold"]
@@ -198,24 +237,25 @@ class BattleManager:
         is_baal = hero.hero_id == "baal"
 
         if is_baal:
-            base_str, base_int, base_agi, base_vit, base_will = (
-                user_stat.stat_str, user_stat.stat_int, user_stat.stat_agi,
-                user_stat.stat_vit, user_stat.stat_will)
+            base_str, base_dex, base_vit, base_lck, base_int = (
+                user_stat.stat_str, user_stat.stat_dex,
+                user_stat.stat_vit, user_stat.stat_lck, user_stat.stat_int)
             lv = user_stat.level
         else:
             base_str = int(hero_base.get("base_str", 10))
-            base_int = int(hero_base.get("base_int", 10))
-            base_agi = int(hero_base.get("base_agi", 10))
+            base_dex = int(hero_base.get("base_dex", 10))
             base_vit = int(hero_base.get("base_vit", 10))
-            base_will = int(hero_base.get("base_will", 10))
+            base_lck = int(hero_base.get("base_lck", 10))
+            base_int = int(hero_base.get("base_int", 10))
             lv = hero.level
 
         total_str = base_str + lv * 2
-        total_int = base_int + lv * 2
-        total_agi = base_agi + lv * 2
+        total_dex = base_dex + lv * 2
         total_vit = base_vit + lv * 2
+        total_lck = base_lck + lv * 2
+        total_int = base_int + lv * 2
 
-        equip_atk = equip_def = equip_agi = equip_will = 0
+        equip_atk = equip_def = equip_dex = equip_int = 0
         if equips:
             for item in equips:
                 base = equip_map.get(item.base_item_id, {})
@@ -223,20 +263,19 @@ class BattleManager:
                 st = base.get("base_stat", "")
                 if st == "atk": equip_atk += v
                 elif st == "def": equip_def += v
-                elif st == "agi": equip_agi += v
-                elif st == "will": equip_will += v
+                elif st == "dex": equip_dex += v
+                elif st == "int": equip_int += v
 
         skill_bonus = cls._calc_skill_tree_bonus(hero)
-        will_bonus = 1.0 + user_stat.stat_will * 0.005 + equip_will * 0.003
         grade_mult = {"common": 1.0, "uncommon": 1.15, "rare": 1.3, "legendary": 1.5}
-        mult = grade_mult.get(hero.grade, 1.0) * will_bonus
+        mult = grade_mult.get(hero.grade, 1.0)
 
-        hp = int(total_vit * BASE_HP_PER_VIT * mult * (1 + skill_bonus.get("hp_pct", 0) / 100))
-        atk = int((total_str * BASE_ATK_PER_STR + equip_atk) * mult * (1 + skill_bonus.get("atk_pct", 0) / 100))
-        matk = int(total_int * BASE_MATK_PER_INT * mult)
+        hp = int((100 + total_vit * 10) * mult * (1 + skill_bonus.get("hp_pct", 0) / 100))
+        atk = int((total_str * BASE_ATK_PER_STR + equip_atk) * (1 + total_str * 0.005) * mult * (1 + skill_bonus.get("atk_pct", 0) / 100))
+        matk = int(total_int * BASE_MATK_PER_INT * (1 + total_int * 0.005) * mult)
         defense = int((total_vit * BASE_DEF_PER_VIT + equip_def) * mult * (1 + skill_bonus.get("def_pct", 0) / 100))
-        speed = BASE_ACTION_SPEED + (total_agi + equip_agi) * ACTION_PER_AGI
-        crit = CRIT_BASE + total_agi * CRIT_PER_AGI + skill_bonus.get("crit", 0)
+        speed = BASE_ACTION_SPEED + (total_dex + equip_dex) * ACTION_PER_DEX
+        crit = (total_lck * 5 + skill_bonus.get("crit", 0)) * 0.001 * 100  # % 값
         final_atk = max(atk, matk)
 
         if is_baal:
@@ -307,6 +346,8 @@ class BattleManager:
         ch_mult = 1 + (chapter - 1) * 0.3
         return {
             "name": monster.get("name", f"몬스터#{monster_idx}"),
+            "monster_idx": int(monster_idx) if str(monster_idx).isdigit() else 0,
+            "exp_reward": int(monster.get("exp_reward", 50)),
             "side": "enemy", "is_boss": False,
             "hp": int(float(monster.get("base_hp", 100)) * ch_mult),
             "max_hp": int(float(monster.get("base_hp", 100)) * ch_mult),

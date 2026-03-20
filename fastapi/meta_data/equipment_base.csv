@@ -1,12 +1,40 @@
-equip_id,equip_name,equip_slot,base_stat,base_value,req_level,description
-w001,낡은 검,weapon,atk,10,1,가장 기본적인 검
-w002,강철 대검,weapon,atk,25,5,묵직한 강철 대검
-w003,화염 검,weapon,atk,45,10,분노의 불꽃이 깃든 검
-w004,죄악의 대검,weapon,atk,70,15,7대 죄악의 기운이 서린 대검
-a001,낡은 갑옷,armor,def,8,1,기본 방어구
-a002,강철 갑옷,armor,def,20,5,튼튼한 강철 갑옷
-a003,화염 갑옷,armor,def,38,10,분노의 불꽃으로 단련된 갑옷
-a004,죄악의 갑옷,armor,def,60,15,7대 죄악의 기운이 서린 갑옷
-x001,뼈 반지,accessory,will,3,1,기본 장신구
-x002,은 반지,accessory,will,7,5,은으로 만든 반지
-x003,죄악의 부적,accessory,will,12,10,죄악의 기운이 서린 부적
+item_idx,item_base,main_group,sub_group,size_type,min_damage,max_damage,speed,base_defense,base_magic_defense,implicit,cost_size_multiplier
+100101,Gladius,weapon,sword,small,7,10,1.25,0,0,crit_rate_10,1.0
+100102,Scimitar,weapon,sword,medium,9,13,1.10,0,0,crit_rate_10,1.0
+100103,Rapier,weapon,sword,large,13,17,0.95,0,0,crit_rate_10,1.0
+100201,Katana,weapon,greatsword,small,8,13,1.05,0,0,armor_ignore_20,1.0
+100202,Zweihander,weapon,greatsword,medium,10,17,0.90,0,0,armor_ignore_20,1.0
+100203,Colossus Blade,weapon,greatsword,large,14,23,0.75,0,0,armor_ignore_20,1.0
+100301,Tomahawk,weapon,axe,small,9,19,1.00,0,0,,1.0
+100302,Berserker Axe,weapon,axe,medium,12,25,0.85,0,0,,1.0
+100303,Executioner,weapon,axe,large,16,34,0.70,0,0,,1.0
+100401,Spear,weapon,spear,small,8,10,1.15,0,0,first_strike,1.0
+100402,Halberd,weapon,spear,medium,10,14,1.00,0,0,first_strike,1.0
+100403,Lance,weapon,spear,large,14,19,0.85,0,0,first_strike,1.0
+100501,Club,weapon,mace,small,8,15,0.95,0,0,stagger_bonus,1.0
+100502,War Hammer,weapon,mace,medium,11,19,0.80,0,0,stagger_bonus,1.0
+100503,Maul,weapon,mace,large,15,26,0.65,0,0,stagger_bonus,1.0
+200101,Dusk Shroud,armor,heavy_armor,small,0,0,0,20,5,,0.9
+200102,Archon Plate,armor,heavy_armor,medium,0,0,0,30,8,,1.0
+200103,Sacred Armor,armor,heavy_armor,large,0,0,0,40,10,,1.1
+200201,Ghost Armor,armor,light_armor,small,0,0,0,12,15,,0.9
+200202,Mesh Armor,armor,light_armor,medium,0,0,0,18,22,,1.0
+200203,Plate Mail,armor,light_armor,large,0,0,0,25,30,,1.1
+300101,Cap,helmet,survival_helm,small,0,0,0,8,3,,1.0
+300102,Helm,helmet,survival_helm,medium,0,0,0,12,5,,1.0
+300103,Full Helm,helmet,survival_helm,large,0,0,0,16,7,,1.0
+300201,Bone Helm,helmet,attack_helm,small,0,0,0,5,2,,1.0
+300202,Demonhead,helmet,attack_helm,medium,0,0,0,8,3,,1.0
+300203,Winged Helm,helmet,attack_helm,large,0,0,0,10,5,,1.0
+400101,Leather Gloves,gloves,accuracy_gloves,small,0,0,0,3,1,,1.0
+400102,Heavy Gloves,gloves,accuracy_gloves,medium,0,0,0,5,2,,1.0
+400103,Gauntlets,gloves,accuracy_gloves,large,0,0,0,7,3,,1.0
+400201,Chain Gloves,gloves,speed_gloves,small,0,0,0,2,1,,1.0
+400202,Light Gauntlets,gloves,speed_gloves,medium,0,0,0,4,2,,1.0
+400203,Crusader Gauntlets,gloves,speed_gloves,large,0,0,0,6,3,,1.0
+500101,Boots,boots,evasion_boots,small,0,0,0,3,1,,1.0
+500102,Heavy Boots,boots,evasion_boots,medium,0,0,0,5,2,,1.0
+500103,Bone Boots,boots,evasion_boots,large,0,0,0,7,3,,1.0
+500201,Chain Boots,boots,magres_boots,small,0,0,0,2,5,,1.0
+500202,Battle Boots,boots,magres_boots,medium,0,0,0,4,8,,1.0
+500203,Crusader Boots,boots,magres_boots,large,0,0,0,6,12,,1.0

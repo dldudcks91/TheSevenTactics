@@ -54,9 +54,9 @@ const TopBar = {
             Store.subscribe('user.stat_points', () => { this._renderStats(); }),
             Store.subscribe('stats.str', () => { this._renderStats(); }),
             Store.subscribe('stats.int', () => { this._renderStats(); }),
-            Store.subscribe('stats.agi', () => { this._renderStats(); }),
+            Store.subscribe('stats.dex', () => { this._renderStats(); }),
             Store.subscribe('stats.vit', () => { this._renderStats(); }),
-            Store.subscribe('stats.will', () => { this._renderStats(); }),
+            Store.subscribe('stats.lck', () => { this._renderStats(); }),
         );
     },
 
@@ -82,9 +82,9 @@ const TopBar = {
         const stats = [
             { label: 'STR', key: 'stats.str' },
             { label: 'INT', key: 'stats.int' },
-            { label: 'AGI', key: 'stats.agi' },
+            { label: 'DEX', key: 'stats.dex' },
             { label: 'VIT', key: 'stats.vit' },
-            { label: 'WIL', key: 'stats.will' },
+            { label: 'LCK', key: 'stats.lck' },
         ];
 
         let html = stats.map(s =>

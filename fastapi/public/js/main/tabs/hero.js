@@ -84,9 +84,9 @@ const HeroTab = {
             <div class="hero-detail-row"><span>진영</span><span class="val">${d.faction}</span></div>
             <div class="hero-detail-row"><span>STR</span><span class="val">${d.base_stats.str}</span></div>
             <div class="hero-detail-row"><span>INT</span><span class="val">${d.base_stats.int}</span></div>
-            <div class="hero-detail-row"><span>AGI</span><span class="val">${d.base_stats.agi}</span></div>
+            <div class="hero-detail-row"><span>DEX</span><span class="val">${d.base_stats.dex}</span></div>
             <div class="hero-detail-row"><span>VIT</span><span class="val">${d.base_stats.vit}</span></div>
-            <div class="hero-detail-row"><span>WIL</span><span class="val">${d.base_stats.will}</span></div>`;
+            <div class="hero-detail-row"><span>LCK</span><span class="val">${d.base_stats.lck}</span></div>`;
 
         if (d.passive_name) {
             html += `<div class="hero-detail-row"><span>패시브</span><span class="val">${d.passive_name}</span></div>`;

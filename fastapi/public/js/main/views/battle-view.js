@@ -495,6 +495,7 @@ const BattleView = {
             <button class="close-x" data-action="back">✕</button>
             <div class="bv-result-text ${v ? 'victory' : 'defeat'}">${v ? '승 리 !' : '패 배...'}</div>
             ${v ? `<div class="bv-result-rewards"><span>EXP +${d.rewards.exp}</span><span>${formatGold(d.rewards.gold)}</span></div>` : ''}
+            ${v && d.rewards.items?.length ? `<div class="bv-result-drops">${d.rewards.items.map(it => `<div class="bv-drop-item" style="color:${{magic:'#6688ff',rare:'#ffcc00',craft:'#ff6600',unique:'#ff44aa'}[it.rarity]||'#aaa'}">${it.item_name} (${it.rarity})</div>`).join('')}</div>` : ''}
             <div class="bv-result-btns">
                 <button class="btn btn-primary" data-action="retry">${v ? '다시 전투' : '재도전'}</button>
                 <button class="btn" data-action="back">마을로</button>

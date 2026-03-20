@@ -6,11 +6,41 @@ from services.system.ErrorCode import ErrorCode, error_response
 
 logger = logging.getLogger("RPG_SERVER")
 
-EQUIP_SLOTS = {"weapon", "armor", "accessory"}
+EQUIP_SLOTS = {"weapon", "armor", "helmet", "gloves", "boots"}
 
 
 class EquipmentManager:
     """장비 인벤토리 / 장착·해제 (API 2xxx)"""
+
+    @classmethod
+    def _item_to_dict(cls, item, equip_map):
+        """Item ORM → 클라이언트 dict 변환"""
+        base = equip_map.get(item.base_item_id, {})
+        main_group = base.get("main_group", item.equip_slot or "")
+        return {
+            "item_uid": item.item_uid,
+            "base_item_id": item.base_item_id,
+            "item_name": base.get("item_base", item.base_item_id),
+            "main_group": main_group,
+            "sub_group": base.get("sub_group", ""),
+            "size_type": base.get("size_type", ""),
+            "min_damage": int(base.get("min_damage", 0)),
+            "max_damage": int(base.get("max_damage", 0)),
+            "speed": float(base.get("speed", 0)),
+            "base_defense": int(base.get("base_defense", 0)),
+            "base_magic_defense": int(base.get("base_magic_defense", 0)),
+            "implicit": base.get("implicit", ""),
+            "item_level": item.item_level,
+            "rarity": item.rarity,
+            "item_score": item.item_score,
+            "prefix_id": item.prefix_id,
+            "suffix_id": item.suffix_id,
+            "set_id": item.set_id,
+            "dynamic_options": item.dynamic_options or {},
+            "is_equipped": item.is_equipped,
+            "equip_slot": item.equip_slot or main_group,
+            "equipped_hero_uid": item.equipped_hero_uid,
+        }
 
     @classmethod
     async def get_inventory(cls, user_no: int, data: dict):
@@ -20,22 +50,7 @@ class EquipmentManager:
             items = db.query(Item).filter(Item.user_no == user_no).all()
             equip_map = GameDataManager.REQUIRE_CONFIGS.get("equip_base_map", {})
 
-            item_list = []
-            for it in items:
-                base = equip_map.get(it.base_item_id, {})
-                item_list.append({
-                    "item_uid": it.item_uid,
-                    "base_item_id": it.base_item_id,
-                    "equip_name": base.get("equip_name", it.base_item_id),
-                    "equip_slot": it.equip_slot or base.get("equip_slot", ""),
-                    "base_stat": base.get("base_stat", ""),
-                    "base_value": int(base.get("base_value", 0)),
-                    "item_level": it.item_level,
-                    "rarity": it.rarity,
-                    "is_equipped": it.is_equipped,
-                    "equipped_hero_uid": it.equipped_hero_uid,
-                    "dynamic_options": it.dynamic_options or {},
-                })
+            item_list = [cls._item_to_dict(it, equip_map) for it in items]
 
             return {
                 "success": True,
@@ -72,10 +87,10 @@ class EquipmentManager:
             if not hero:
                 return error_response(ErrorCode.HERO_NOT_FOUND, "영웅을 찾을 수 없습니다.")
 
-            # 장비 슬롯 확인
+            # 장비 슬롯 확인 (equipment_base.csv의 main_group)
             equip_map = GameDataManager.REQUIRE_CONFIGS.get("equip_base_map", {})
             base = equip_map.get(item.base_item_id, {})
-            slot = base.get("equip_slot", item.equip_slot or "")
+            slot = base.get("main_group", item.equip_slot or "")
             if slot not in EQUIP_SLOTS:
                 return error_response(ErrorCode.EQUIP_SLOT_MISMATCH, f"장착 불가 슬롯: {slot}")
 
@@ -105,7 +120,7 @@ class EquipmentManager:
 
             return {
                 "success": True,
-                "message": f"{base.get('equip_name', item_uid)} 장착 완료",
+                "message": f"{base.get('item_base', item_uid)} 장착 완료",
                 "data": {
                     "item_uid": item_uid,
                     "hero_uid": hero_uid,
@@ -149,12 +164,55 @@ class EquipmentManager:
 
             return {
                 "success": True,
-                "message": f"{base.get('equip_name', item_uid)} 해제 완료",
+                "message": f"{base.get('item_base', item_uid)} 해제 완료",
                 "data": {"item_uid": item_uid},
             }
         except Exception as e:
             db.rollback()
             logger.error(f"[EquipmentManager] unequip_item 실패: {e}", exc_info=True)
             return error_response(ErrorCode.DB_ERROR, "장비 해제 중 오류가 발생했습니다.")
+        finally:
+            db.close()
+
+    @classmethod
+    async def sell_item(cls, user_no: int, data: dict):
+        """API 2004: 아이템 판매"""
+        item_uid = data.get("item_uid")
+        if not item_uid:
+            return error_response(ErrorCode.INVALID_REQUEST, "item_uid가 필요합니다.")
+
+        db = SessionLocal()
+        try:
+            from models import User
+            item = db.query(Item).filter(
+                Item.item_uid == item_uid,
+                Item.user_no == user_no
+            ).with_for_update().first()
+            if not item:
+                return error_response(ErrorCode.ITEM_NOT_FOUND, "아이템을 찾을 수 없습니다.")
+
+            if item.is_equipped:
+                return error_response(ErrorCode.INVALID_REQUEST, "장착 중인 아이템은 판매할 수 없습니다.")
+
+            # 판매 가격: item_level × rarity 배율
+            rarity_mult = {"magic": 10, "rare": 30, "craft": 50, "unique": 100}
+            sell_price = max(1, item.item_level * rarity_mult.get(item.rarity, 5))
+
+            user = db.query(User).filter(User.user_no == user_no).with_for_update().first()
+            user.gold += sell_price
+            db.delete(item)
+            db.commit()
+
+            logger.info(f"[EquipmentManager] 판매 (user={user_no}, item={item_uid}, gold=+{sell_price})")
+
+            return {
+                "success": True,
+                "message": f"아이템 판매 완료 (+{sell_price}G)",
+                "data": {"gold": user.gold, "sell_price": sell_price},
+            }
+        except Exception as e:
+            db.rollback()
+            logger.error(f"[EquipmentManager] sell_item 실패: {e}", exc_info=True)
+            return error_response(ErrorCode.DB_ERROR, "아이템 판매 중 오류가 발생했습니다.")
         finally:
             db.close()

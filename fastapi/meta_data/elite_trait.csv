@@ -1,0 +1,24 @@
+trait_id,trait_type,trait_name,trait_korean,effect_desc,value_1,value_2,counter_hint
+wrath_unique,sin_unique,frenzy,격분,HP 30% 이하 시 공격력 ×2 공격속도 +50%,30,200,30% 전에 끝내기
+sloth_unique,sin_unique,apathy,태만,공격속도 -50% 공격력 ×2,-50,200,HP/방어로 한방 버티기
+lust_unique,sin_unique,temptation,유혹,타격 시 플레이어 공격력 10% 흡수 스택,10,,회피로 피격 줄이기 속전속결
+envy_unique,sin_unique,deprivation,박탈,치명타/회피 발동 시 무효화 정상 피해로 변환,,,순수 공방 싸움
+pride_unique,sin_unique,inviolable,불가침,모든 상태이상 면역,,,스탯으로 압도
+gluttony_unique,sin_unique,gorging,탐식,매 타격마다 공격력 +2% 영구 누적,2,,속전속결
+greed_unique,sin_unique,gamble,도박,피해 0.2~1.8배 랜덤 처치 시 드롭 +1,0.2,1.8,HP 여유 + 리스크 감수 보상
+common_stat_1,common,vigorous,강인한,HP +50%,50,,
+common_stat_2,common,durable,단단한,방어력 +50%,50,,
+common_stat_3,common,gigantic,거대한,사이즈 +1단계 HP +20%,1,20,
+common_stat_4,common,swift,날랜,공격속도 +30%,30,,
+common_stat_5,common,ferocious,흉포한,공격력 +30%,30,,
+common_stat_6,common,nimble,민첩한,회피율 +30%,30,,
+common_stat_7,common,precise,정확한,명중률 +30%,30,,
+common_stat_8,common,deadly,치명적인,치명타 확률 +20% 치명타 데미지 +50%,20,50,
+common_combat_1,common,regenerating,재생하는,매초 HP 1% 회복,1,,
+common_combat_2,common,thorny,가시의,받은 피해 15% 반사,15,,
+common_combat_3,common,hardening,경화의,피격마다 방어력 +1% 영구 누적,1,,
+common_combat_4,common,preemptive,선제의,전투 시작 시 선제 공격 1회 100% 명중,1,,
+common_combat_5,common,retaliatory,보복의,피격 시 30% 확률 즉시 반격 1회,30,,
+common_combat_6,common,explosive,폭발하는,사망 시 최대HP 50% 피해,50,,
+common_combat_7,common,cursed,저주받은,타격 시 30% 확률 랜덤 상태이상 부여,30,,
+common_combat_8,common,vampiric,흡혈의,피해의 20% HP 회복,20,,

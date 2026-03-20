@@ -1,0 +1,5 @@
+grade,grade_korean,hp_mult,atk_mult,exp_mult,gold_mult,drop_roll,battle_time_target
+normal,일반,1.0,1.0,1.0,1.0,1,14
+elite,정예,3.0,1.5,3.0,2.0,3,28
+stage_boss,스테이지보스,10.0,2.5,10.0,5.0,5,70
+chapter_boss,챕터보스,20.0,5.0,20.0,10.0,7,300

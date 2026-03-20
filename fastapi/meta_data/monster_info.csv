@@ -1,31 +1,95 @@
-monster_idx,monster_name,monster_base,size_type,hp,attack,defense,magic_defense,attack_speed,exp_reward
-101,고블린 정찰병,goblin,1,60,12,3,2,1.0,20
-102,고블린 전사,goblin,1,80,15,5,3,0.9,25
-103,오크 전사,orc,2,120,18,8,4,0.8,35
-104,아바돈,demon,2,200,25,10,6,1.1,60
-105,인간 보병,human,1,70,14,6,3,0.9,22
-106,인간 창병,human,1,85,16,5,3,1.0,28
-107,트롤 돌격병,troll,2,150,20,7,4,0.7,40
-108,레기온,demon,2,250,22,8,5,1.0,70
-109,스켈레톤 전사,skeleton,1,65,13,4,2,1.1,20
-110,스켈레톤 궁수,skeleton,1,50,16,3,2,1.2,22
-111,스켈레톤 기사,skeleton,2,130,19,10,5,0.8,38
-112,둘라한,undead,2,280,24,12,7,0.9,80
-113,오크 근위,orc,2,160,22,9,5,0.8,45
-114,임프 마법사,imp,1,90,20,4,8,1.1,30
-115,몰록,demon,3,400,30,15,8,0.9,120
-201,독 늑대,wolf,1,70,14,4,3,1.2,25
-202,리자드맨 주술사,lizard,1,80,16,5,6,1.0,28
-203,리자드맨 돌격병,lizard,1,100,18,7,4,0.9,32
-204,사마엘,demon,2,220,24,8,10,1.1,65
-205,서큐버스 마녀,succubus,1,75,20,4,8,1.1,30
-206,서큐버스 독사,succubus,1,85,18,5,7,1.0,28
-207,오크 찬탈자,orc,2,130,20,8,5,0.8,38
-208,아비주,demon,2,260,26,9,12,1.0,75
-209,나무 유령,ghost,1,60,15,3,10,1.0,22
-210,통곡의 고스트,ghost,1,70,17,3,12,1.1,28
-211,뿌리 좀비,zombie,1,100,14,8,3,0.7,25
-212,밴시,undead,2,240,22,7,14,1.0,70
-213,서큐버스 근위,succubus,2,150,22,6,10,1.0,40
-214,리자드맨 정예,lizard,2,140,20,9,6,0.9,38
-215,나르키소스,demon,3,450,28,10,15,1.1,130
+monster_idx,monster_name,monster_type,monster_base,size_type,hp,attack,defense,magic_defense,attack_speed,exp_reward,sprite_path,description
+1101,고블린 척후병,Demon,Goblin,1,55,8,3,10,0.75,45,ch1_goblin_scout,파멸의 진영 선봉 잡병
+1102,고블린 전사,Demon,Goblin,1,70,10,5,12,0.65,65,ch1_goblin_warrior,무기를 든 정규 고블린 병사
+1103,오크 전사,Demon,Orc,2,95,14,10,8,0.45,140,ch1_orc_warrior,강력한 한 방의 오크 전사
+1150,아바돈,Demon,Orc,3,450,10,15,8,0.35,450,ch1_boss_abaddon,파멸의 군주 — 무저갱의 왕
+1201,인간 보병,Normal,Human,1,80,10,8,5,0.6,55,ch1_human_infantry,검과 방패의 정규 병사
+1202,인간 창병,Normal,Human,1,70,12,5,5,0.65,60,ch1_human_spearman,긴 창을 든 돌격 병사
+1203,트롤 돌격병,Normal,Troll,2,120,16,16,8,0.35,150,ch1_troll_charger,묵직한 강타의 거대 트롤
+1250,레기온,Normal,Human,2,580,12,18,15,0.3,400,ch1_boss_legion,천의 목소리 — 천 개의 분노가 깃든 자
+1301,스켈레톤 전사,Undead,Skeleton,1,90,12,8,5,0.6,50,ch1_skeleton_warrior,묘지에서 일어난 해골 병사
+1302,스켈레톤 궁수,Undead,Skeleton,1,75,15,4,5,0.65,55,ch1_skeleton_archer,뼈활을 다루는 해골 궁수
+1303,스켈레톤 기사,Undead,Skeleton,2,140,18,16,8,0.4,140,ch1_skeleton_knight,해골 말을 탄 기마 전사
+1350,둘라한,Undead,Skeleton,2,720,14,22,10,0.3,420,ch1_boss_dullahan,머리 없는 전쟁귀
+1401,제단의 화염마,Demon,Imp,1,100,14,5,18,0.7,55,ch1_imp_firetender,제단의 불꽃을 관리하는 임프
+1402,몰록의 제물관,Demon,Imp,2,130,18,10,22,0.55,120,ch1_imp_offerings,의식을 집행하는 임프 사제
+1403,몰록의 심판관,Demon,Imp,3,170,22,18,30,0.45,250,ch1_imp_judge,제물 자격을 판결하는 대임프
+1900,몰록,Demon,Gargoyle,3,3800,20,35,30,0.25,2000,ch1_chboss_moloch,불의 심복 — 사탄의 문지기
+2101,독늑대 척후,Normal,Wolf,1,70,16,6,5,1.6,55,ch2_wolf_scout,독에 변형된 날렵한 늑대
+2102,도마뱀 저주사,Normal,Lizardman,1,85,18,8,20,1.3,65,ch2_lizardman_hexer,독 주술의 원거리 마법형
+2103,도마뱀 돌격병,Normal,Lizardman,2,200,28,16,15,1.0,150,ch2_lizardman_charger,독에 의해 비대해진 거대 도마뱀
+2150,사마엘,Normal,Lizardman,2,550,85,40,35,1.0,500,ch2_boss_samael,독의 지배자 — 죽음의 천사
+2201,서큐버스 유혹마,Demon,Succubus,2,120,22,8,35,1.2,100,ch2_succubus_enchantress,시기심을 부추기는 디버프형
+2202,서큐버스 독술사,Demon,Succubus,1,100,25,6,30,1.3,90,ch2_succubus_poisoner,독안개 마법 원거리 공격
+2203,오크 탈취자,Demon,Orc,2,220,35,20,12,1.0,160,ch2_orc_usurper,남의 힘을 탐내 변형된 야만 전사
+2250,아비주,Demon,Succubus,2,520,80,30,55,1.1,480,ch2_boss_abyzou,시기의 어머니 — 타인을 시기하여 저주하는 악마
+2301,수목 원혼,Undead,Ghost,1,75,15,3,35,1.3,60,ch2_ghost_treespirit,나무에 깃든 원한의 영혼
+2302,울부짖는 유령,Undead,Ghost,1,90,20,4,40,1.2,75,ch2_ghost_wailer,시기의 울음소리 저주 디버프형
+2303,뿌리 좀비,Undead,Zombie,2,250,22,18,8,0.7,160,ch2_zombie_rotroot,썩은 뿌리에 얽힌 거대 시체
+2350,밴시,Undead,Ghost,2,500,78,20,70,1.0,460,ch2_boss_banshee,부패한 곡성 — 죽음을 예고하는 울음
+2900,레비아탄,Demon,Gargoyle,3,2200,230,90,80,0.6,2500,ch2_chboss_leviathan,시기의 심연에서 올라온 괴물
+3101,사막 도마뱀 약탈자,Normal,Lizardman,1,95,20,10,8,1.4,70,ch3_lizardman_raider,폐허의 보물 사냥꾼
+3102,사막 도마뱀 주술사,Normal,Lizardman,1,80,22,7,22,1.2,75,ch3_lizardman_shaman,모래 마법 원거리
+3103,사암 골렘,Normal,Golem,2,250,20,35,15,0.6,170,ch3_golem_sandstone,폐허에서 깨어난 거대 석상
+3150,다곤,Normal,Golem,3,600,90,55,30,0.7,550,ch3_boss_dagon,모래에 묻힌 신 — 반인반어 고대 신
+3201,해골 수호병,Undead,Skeleton,1,90,14,10,6,1.2,60,ch3_skeleton_guardian,묘지 수호 근접 전사
+3202,해골 석궁병,Undead,Skeleton,1,75,20,6,6,1.3,65,ch3_skeleton_crossbow,지하묘지 함정 지킴이
+3203,뱀파이어 귀족,Undead,Vampire,2,240,30,18,30,1.1,180,ch3_vampire_noble,지하묘지의 흡혈 지배자
+3250,카론,Undead,Skeleton,2,580,85,45,25,0.8,520,ch3_boss_charon,탐욕의 뱃사공 — 대가 없이는 건너지 못한다
+3301,황금 임프,Demon,Imp,1,85,22,6,25,1.5,70,ch3_imp_goldfire,보물고의 마법 수비수
+3302,고블린 약탈병,Demon,Goblin,1,75,18,8,15,1.6,60,ch3_goblin_looter,잔꾀형 보물 약탈자
+3303,고블린 금고지기,Demon,Goblin,2,200,32,22,20,1.0,170,ch3_goblin_vaultkeeper,황금 갑옷의 거대 고블린 대장
+3350,메피스토펠레스,Demon,Gargoyle,3,620,95,40,50,0.9,580,ch3_boss_mephistopheles,황금의 거래자 — 영혼 거래의 아이콘
+3900,맘몬,Demon,Gargoyle,3,2600,260,100,90,0.6,3000,ch3_chboss_mammon,탐욕의 왕 — 황금 왕국의 지배자
+4101,서리 원혼,Undead,Ghost,1,85,18,4,40,1.3,75,ch4_ghost_frostwraith,냉기 마법의 얼어붙은 영혼
+4102,동결 곡성귀,Undead,Ghost,1,100,22,5,45,1.1,85,ch4_ghost_frostwailer,빙결 저주 디버프형
+4103,빙결 좀비,Undead,Zombie,2,280,25,20,10,0.6,180,ch4_zombie_frozen,얼음에 묻혀있던 거대 시체
+4150,유키온나,Undead,Ghost,2,640,95,25,75,1.0,600,ch4_boss_yukionna,동토의 설녀 — 눈보라 속 유령 여인
+4201,서리 고블린 병사,Demon,Goblin,1,80,20,10,18,1.5,70,ch4_goblin_frostguard,빙하 요새 경비병
+4202,얼음 임프,Demon,Imp,1,90,24,6,30,1.4,80,ch4_imp_icecaster,냉기 마법 원거리
+4203,고블린 빙하대장,Demon,Goblin,2,220,35,25,22,0.9,185,ch4_goblin_glaciercaptain,얼음 갑옷의 거대 고블린 대장
+4250,아스타로스,Demon,Gargoyle,2,660,100,50,40,0.8,620,ch4_boss_astaroth,빙하의 태공 — 게으름과 허영의 악마
+4301,예티 척후,Normal,Yeti,2,200,28,15,8,1.0,150,ch4_yeti_scout,설인 정찰병
+4302,예티 투석병,Normal,Yeti,2,180,32,12,10,0.9,140,ch4_yeti_hurler,얼음 덩이를 던지는 원거리
+4303,트롤 빙하거인,Normal,Troll,3,350,40,40,15,0.5,280,ch4_troll_glacier,얼어붙은 피부의 거대 트롤
+4350,파주주,Normal,Troll,3,680,105,55,30,0.7,640,ch4_boss_pazuzu,얼어붙은 바람왕 — 동토에 영원히 얼어붙은 자
+4900,벨페고르,Demon,Gargoyle,3,3000,290,110,100,0.5,3500,ch4_chboss_belphegor,나태의 왕 — 모든 것이 멈추기를 원하는 자
+5101,부식 좀비,Undead,Zombie,2,300,28,15,8,0.7,180,ch5_zombie_corrosion,삼켜진 시체가 움직이는 형태
+5102,리치 수행자,Undead,Lich,2,200,35,10,55,1.0,200,ch5_lich_acolyte,심연의 마법을 다루는 하급 리치
+5103,부식 리치,Undead,Lich,2,280,42,12,65,0.9,280,ch5_lich_corroder,부식 마법을 다루는 상급 리치
+5150,플레이스홀더,Undead,Lich,3,700,110,30,80,0.8,700,ch5_boss_st1,탐식의 문지기
+5201,동굴 예티,Normal,Yeti,2,250,32,18,10,0.9,190,ch5_yeti_cave,동굴에 서식하는 예티
+5202,바위 골렘,Normal,Golem,2,300,24,40,18,0.5,200,ch5_golem_rock,살아있는 미로의 돌 파수꾼
+5203,거대 골렘,Normal,Golem,3,450,38,60,25,0.4,320,ch5_golem_ancient,심연의 핵심을 지키는 고대 골렘
+5250,플레이스홀더,Normal,Golem,3,720,115,60,35,0.6,720,ch5_boss_st2,맥동하는 미로의 수호자
+5301,가고일 파수꾼,Demon,Gargoyle,2,280,30,30,25,0.9,210,ch5_gargoyle_guardian,심연 입구를 지키는 가고일
+5302,오크 포식자,Demon,Orc,2,320,45,22,12,1.0,240,ch5_orc_devourer,모든 것을 탐하는 오크
+5303,악마 가고일,Demon,Gargoyle,3,420,50,40,35,0.8,350,ch5_gargoyle_demon,심연의 최심부 가고일
+5350,플레이스홀더,Demon,Gargoyle,3,740,120,45,50,0.8,740,ch5_boss_st3,소화의 심연 지배자
+5900,바알제붑,Demon,Gargoyle,3,3400,320,120,110,0.5,4000,ch5_chboss_beelzebub,폭식의 왕 — 모든 것을 삼키는 심연의 군주
+6101,서큐버스 유혹자,Demon,Succubus,2,250,28,10,40,1.2,200,ch6_succubus_tempter,타락한 정원의 유혹 마녀
+6102,화염 임프,Demon,Imp,1,110,26,7,28,1.4,150,ch6_imp_flame,정원을 지키는 임프 마법사
+6103,대임프 사제,Demon,Imp,2,200,35,15,40,1.1,230,ch6_imp_highpriest,타락 의식을 집행하는 사제
+6150,플레이스홀더,Demon,Succubus,2,760,125,35,60,1.0,760,ch6_boss_st1,부패한 정원의 지배자
+6201,뱀파이어 후작,Undead,Vampire,2,280,35,20,35,1.1,240,ch6_vampire_marquis,회랑을 떠도는 흡혈 귀족
+6202,유혹의 유령,Undead,Ghost,1,120,25,5,50,1.2,160,ch6_ghost_allure,유혹의 속삭임으로 현혹하는 유령
+6203,뱀파이어 백작,Undead,Vampire,3,400,50,30,50,0.9,350,ch6_vampire_count,회랑의 지배자 흡혈 백작
+6250,플레이스홀더,Undead,Vampire,3,780,130,40,65,0.9,780,ch6_boss_st2,유혹의 회랑 주인
+6301,도마뱀 근위병,Normal,Lizardman,2,260,32,18,12,1.1,220,ch6_lizardman_guard,왕좌를 지키는 근위 전사
+6302,트롤 집행자,Normal,Troll,2,350,38,35,15,0.7,280,ch6_troll_executor,욕망의 왕좌 집행관
+6303,도마뱀 대장,Normal,Lizardman,2,300,40,22,18,1.0,260,ch6_lizardman_captain,근위대 대장
+6350,플레이스홀더,Normal,Troll,3,800,135,55,30,0.7,800,ch6_boss_st3,욕망의 왕좌 수호자
+6900,아스모데우스,Demon,Gargoyle,3,3800,350,130,120,0.5,4500,ch6_chboss_asmodeus,색욕의 왕 — 욕망에 잠식된 궁전의 지배자
+7101,가고일 천상병,Demon,Gargoyle,2,320,35,35,30,0.9,250,ch7_gargoyle_celestial,천상의 계단을 지키는 가고일
+7102,오크 성기사,Demon,Orc,2,350,48,25,15,1.0,280,ch7_orc_paladin,타락한 성기사 오크
+7103,가고일 대장,Demon,Gargoyle,3,480,55,45,40,0.8,380,ch7_gargoyle_captain,가고일 부대 지휘관
+7150,플레이스홀더,Demon,Gargoyle,3,840,140,55,50,0.8,840,ch7_boss_st1,천상의 계단 수호자
+7201,신전 골렘,Normal,Golem,2,350,28,45,20,0.5,240,ch7_golem_temple,무너진 신전의 석상 파수꾼
+7202,예티 순례자,Normal,Yeti,2,280,38,18,12,0.9,230,ch7_yeti_pilgrim,신전을 떠도는 설인
+7203,고대 골렘,Normal,Golem,3,500,42,65,30,0.4,380,ch7_golem_divine,신성한 힘이 오염된 고대 골렘
+7250,플레이스홀더,Normal,Golem,3,860,145,65,35,0.6,860,ch7_boss_st2,무너진 신전의 수호자
+7301,리치 왕,Undead,Lich,2,300,45,15,80,0.8,300,ch7_lich_king,언데드 군단의 리치 왕
+7302,뱀파이어 공작,Undead,Vampire,2,350,50,25,50,1.0,320,ch7_vampire_duke,왕좌를 노리는 흡혈 공작
+7303,대리치,Undead,Lich,3,450,60,20,90,0.7,420,ch7_lich_arch,오만의 마법을 다루는 대리치
+7350,플레이스홀더,Undead,Lich,3,880,150,30,85,0.7,880,ch7_boss_st3,오만의 왕좌 수호자
+7900,루시퍼,Demon,Gargoyle,3,4200,380,140,140,0.5,5000,ch7_chboss_lucifer,오만의 왕 — 스스로를 신이라 칭하다 추락한 자

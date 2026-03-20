@@ -1,0 +1,5 @@
+﻿param_name,value,description,category
+field_level_multiplier,2.0,필드 레벨이 베이스 점수에 곱해지는 값,base_calculation
+level_growth_rate,0.01,몬스터 레벨 1당 스코어 증가율 (1% = 0.01),multiplier
+min_base_score,5.0,최소 베이스 점수 보정값,base_calculation
+score_variance,0.05,스코어 랜덤 변동폭 (±5%),randomness

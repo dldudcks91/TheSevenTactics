@@ -10,7 +10,7 @@ logger = logging.getLogger("RPG_SERVER")
 class UserInfoManager:
     """유저 정보 관리 (API 1004, 1005)"""
 
-    INITIAL_STAT_VALUE = 5           # 스탯 초기값 (5종 모두 동일)
+    INITIAL_STAT_VALUE = 10           # 스탯 초기값 (5종 모두 동일)
     STAT_RESET_COST_PER_LEVEL = 500  # 스탯 리셋 비용 = 레벨 × 이 값 (나르키소스 거울의 방)
 
     @classmethod
@@ -18,7 +18,7 @@ class UserInfoManager:
         """
         유저 캐릭터 정보 반환
         - User: gold, current_stage
-        - UserStat: level, exp, 5스탯 (str/int/agi/vit/will)
+        - UserStat: level, exp, 5스탯 (STR/DEX/VIT/LCK/INT)
         """
         db = SessionLocal()
         try:
@@ -43,9 +43,9 @@ class UserInfoManager:
                     "stats": {
                         "str": stat.stat_str,
                         "int": stat.stat_int,
-                        "agi": stat.stat_agi,
+                        "dex": stat.stat_dex,
                         "vit": stat.stat_vit,
-                        "will": stat.stat_will,
+                        "lck": stat.stat_lck,
                     },
                     "stat_points": stat.stat_points,
                 },
@@ -62,7 +62,7 @@ class UserInfoManager:
         """
         API 1005: 스탯 리셋
         - 골드 소비 (레벨 × STAT_RESET_COST_PER_LEVEL)
-        - 5종 스탯 → 초기값(5)으로 리셋
+        - 5종 스탯 → 초기값(10)으로 리셋
         - 투자한 포인트 전부 회수
         """
         db = SessionLocal()
@@ -84,9 +84,9 @@ class UserInfoManager:
             invested = (
                 (stat.stat_str - cls.INITIAL_STAT_VALUE)
                 + (stat.stat_int - cls.INITIAL_STAT_VALUE)
-                + (stat.stat_agi - cls.INITIAL_STAT_VALUE)
+                + (stat.stat_dex - cls.INITIAL_STAT_VALUE)
                 + (stat.stat_vit - cls.INITIAL_STAT_VALUE)
-                + (stat.stat_will - cls.INITIAL_STAT_VALUE)
+                + (stat.stat_lck - cls.INITIAL_STAT_VALUE)
             )
             if invested <= 0:
                 return error_response(ErrorCode.INVALID_REQUEST, "리셋할 스탯이 없습니다.")
@@ -95,9 +95,9 @@ class UserInfoManager:
             user.gold -= reset_cost
             stat.stat_str = cls.INITIAL_STAT_VALUE
             stat.stat_int = cls.INITIAL_STAT_VALUE
-            stat.stat_agi = cls.INITIAL_STAT_VALUE
+            stat.stat_dex = cls.INITIAL_STAT_VALUE
             stat.stat_vit = cls.INITIAL_STAT_VALUE
-            stat.stat_will = cls.INITIAL_STAT_VALUE
+            stat.stat_lck = cls.INITIAL_STAT_VALUE
             stat.stat_points += invested
 
             logger.info(f"[UserInfoManager] 스탯 리셋 완료 (user_no={user_no}, cost={reset_cost}, 회수 포인트={invested})")
@@ -125,9 +125,9 @@ class UserInfoManager:
                 "stats": {
                     "str": stat.stat_str,
                     "int": stat.stat_int,
-                    "agi": stat.stat_agi,
+                    "dex": stat.stat_dex,
                     "vit": stat.stat_vit,
-                    "will": stat.stat_will,
+                    "lck": stat.stat_lck,
                 },
                 "reset_cost": reset_cost,
             },

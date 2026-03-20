@@ -1,0 +1,5 @@
+rarity,rarity_korean,min_score,max_score,base_cost,prefix_count,suffix_count,option_min,option_max,color_hex,description
+magic,매직,30,200,1.0,1,0,1,3,#4169E1,파란색 - 죄종옵션1 + 공통옵션1
+rare,레어,150,800,1.5,1,1,2,6,#FFD700,노란색 - 죄종옵션2 + 공통옵션2
+craft,크래프트,150,800,2.0,1,1,2,6,#22C55E,초록색 - 크래프팅 제작 (죄종 선택 가능)
+unique,유니크,500,99999,2.5,0,0,0,0,#FF8C00,주황색 - 고정 옵션 (챕터보스 드랍)

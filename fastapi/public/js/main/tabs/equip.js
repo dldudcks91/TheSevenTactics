@@ -1,15 +1,15 @@
 /**
- * TheSevenTactics — Equipment Tab
- * 영웅별 장비 장착/해제 + 인벤토리
+ * TheSevenTactics — Equipment Tab (5부위: weapon/armor/helmet/gloves/boots)
+ * 영웅별 장비 장착/해제 + 인벤토리 + 판매
  */
 import { apiCall } from '../../api.js';
 import { showToast } from '../../utils.js';
 
 const SLOT_LABEL = {
-    weapon: '무기', armor: '갑옷', accessory: '장신구',
+    weapon: '무기', armor: '갑옷', helmet: '투구', gloves: '장갑', boots: '신발',
 };
-const SLOT_ORDER = ['weapon', 'armor', 'accessory'];
-const RARITY_CLASS = { common: 'rarity-common', magic: 'rarity-magic', rare: 'rarity-rare', unique: 'rarity-unique' };
+const SLOT_ORDER = ['weapon', 'armor', 'helmet', 'gloves', 'boots'];
+const RARITY_COLOR = { magic: '#6688ff', rare: '#ffcc00', craft: '#ff6600', unique: '#ff44aa' };
 
 const EquipTab = {
     el: null,
@@ -62,19 +62,24 @@ const EquipTab = {
         }
         html += '</div>';
 
-        // 장착 슬롯
+        // 5부위 장착 슬롯
         const equipped = this._items.filter(it => it.is_equipped && it.equipped_hero_uid === this._selectedHeroUid);
         const equippedBySlot = {};
-        for (const it of equipped) equippedBySlot[it.equip_slot] = it;
+        for (const it of equipped) equippedBySlot[it.equip_slot || it.main_group] = it;
 
         html += '<div class="equip-slots">';
         for (const slot of SLOT_ORDER) {
             const it = equippedBySlot[slot];
             if (it) {
-                html += `<div class="equip-slot-card filled" data-action="unequip" data-item-uid="${it.item_uid}">
+                const color = RARITY_COLOR[it.rarity] || '#aaa';
+                const statText = it.min_damage > 0
+                    ? `DMG ${it.min_damage}~${it.max_damage}`
+                    : `DEF ${it.base_defense}`;
+                html += `<div class="equip-slot-card filled" data-action="unequip" data-item-uid="${it.item_uid}" style="border-color:${color}">
                     <div class="equip-slot-label">${SLOT_LABEL[slot]}</div>
-                    <div class="equip-slot-name">${it.equip_name}</div>
-                    <div class="equip-slot-stat">${it.base_stat.toUpperCase()} +${it.base_value}</div>
+                    <div class="equip-slot-name" style="color:${color}">${it.item_name}</div>
+                    <div class="equip-slot-stat">${statText}</div>
+                    <div class="equip-slot-rarity">${it.rarity} iLv${it.item_level}</div>
                 </div>`;
             } else {
                 html += `<div class="equip-slot-card">
@@ -85,19 +90,28 @@ const EquipTab = {
         }
         html += '</div>';
 
-        // 인벤토리 (미장착 아이템 + 다른 영웅 장착 아이템)
+        // 인벤토리
         html += '<div class="equip-inv-title">인벤토리</div>';
         const unequipped = this._items.filter(it => !it.is_equipped);
         if (unequipped.length) {
             html += '<div class="equip-inv-list">';
             for (const it of unequipped) {
-                const rc = RARITY_CLASS[it.rarity] || '';
-                html += `<div class="equip-inv-item" data-action="equip" data-item-uid="${it.item_uid}">
+                const color = RARITY_COLOR[it.rarity] || '#aaa';
+                const slotName = SLOT_LABEL[it.main_group] || it.main_group;
+                const statText = it.min_damage > 0
+                    ? `DMG ${it.min_damage}~${it.max_damage}`
+                    : `DEF ${it.base_defense}`;
+                html += `<div class="equip-inv-item">
                     <div class="equip-inv-info">
-                        <div class="equip-inv-name ${rc}">${it.equip_name}</div>
-                        <div class="equip-inv-meta">${SLOT_LABEL[it.equip_slot] || it.equip_slot} · ${it.base_stat.toUpperCase()} +${it.base_value}</div>
+                        <div class="equip-inv-name" style="color:${color}">${it.item_name}</div>
+                        <div class="equip-inv-meta">${slotName} · ${statText} · iLv${it.item_level}</div>
+                        ${it.prefix_id ? `<div class="equip-inv-affix">접두: ${it.prefix_id}</div>` : ''}
+                        ${it.suffix_id ? `<div class="equip-inv-affix">접미: ${it.suffix_id}</div>` : ''}
                     </div>
-                    <button class="equip-action-btn" data-action="equip" data-item-uid="${it.item_uid}">장착</button>
+                    <div class="equip-inv-actions">
+                        <button class="equip-action-btn" data-action="equip" data-item-uid="${it.item_uid}">장착</button>
+                        <button class="equip-action-btn sell" data-action="sell" data-item-uid="${it.item_uid}">판매</button>
+                    </div>
                 </div>`;
             }
             html += '</div>';
@@ -129,6 +143,12 @@ const EquipTab = {
         const unequip = e.target.closest('[data-action="unequip"]');
         if (unequip) {
             this._unequipItem(unequip.dataset.itemUid);
+            return;
+        }
+
+        const sell = e.target.closest('[data-action="sell"]');
+        if (sell) {
+            this._sellItem(sell.dataset.itemUid);
         }
     },
 
@@ -142,6 +162,14 @@ const EquipTab = {
 
     async _unequipItem(itemUid) {
         const result = await apiCall(2003, { item_uid: itemUid });
+        if (result?.success) {
+            showToast(result.message, 'success');
+            await this._refreshInventory();
+        }
+    },
+
+    async _sellItem(itemUid) {
+        const result = await apiCall(2004, { item_uid: itemUid });
         if (result?.success) {
             showToast(result.message, 'success');
             await this._refreshInventory();

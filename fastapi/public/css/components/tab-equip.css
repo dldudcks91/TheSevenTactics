@@ -23,7 +23,7 @@
 
 /* 장착 슬롯 그리드 */
 .equip-slots {
-    display: grid; grid-template-columns: 1fr 1fr;
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
     gap: var(--spacing-xs); margin-bottom: var(--spacing-sm);
 }
 
@@ -88,7 +88,13 @@
     box-shadow: inset -1px -1px 0 0 var(--border-dark), inset 1px 1px 0 0 var(--border-highlight);
 }
 .equip-action-btn:hover { background: var(--bg-tertiary); color: #fff; }
+.equip-action-btn.sell { color: var(--color-error); border-color: var(--color-error); }
+.equip-action-btn.sell:hover { background: var(--color-error); color: #fff; }
 .equip-action-btn.unequip { color: var(--color-error); }
+
+.equip-inv-actions { display: flex; gap: 4px; }
+.equip-inv-affix { font-size: 8px; color: var(--text-muted); }
+.equip-slot-rarity { font-size: 8px; color: var(--text-muted); margin-top: 2px; }
 
 .equip-empty {
     display: flex; align-items: center; justify-content: center;

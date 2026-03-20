@@ -15,6 +15,7 @@ class APIManager:
         2001: (EquipmentManager, EquipmentManager.get_inventory),
         2002: (EquipmentManager, EquipmentManager.equip_item),
         2003: (EquipmentManager, EquipmentManager.unequip_item),
+        2004: (EquipmentManager, EquipmentManager.sell_item),
 
         # === 전투 API (3xxx) ===
         3001: (BattleManager, BattleManager.battle_start),

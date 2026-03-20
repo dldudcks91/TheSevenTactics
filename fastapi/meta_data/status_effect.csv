@@ -1,0 +1,8 @@
+effect_id,effect_korean,effect_en,chapter,sin,effect_type,effect_desc,counter_target,duration_sec,stack_rule
+burn,화상,Burn,1,wrath,debuff,체력회복 감소,흡혈(색욕) 빌드 견제,4,refresh
+poison,중독,Poison,2,envy,dot,매 초 고정 데미지,탱커 견제,4,refresh
+stun,스턴,Stun,3,greed,disable,일정 시간 공격 불가,고공속 빌드 견제,1,refresh
+freeze,빙결,Freeze,4,sloth,slow,공격속도 감소,공속형 빌드 견제,3,refresh
+corrode,침식,Corrode,5,gluttony,stack_debuff,피격마다 방어력 영구 감소 (스택형),방어형 빌드 견제,permanent,stack
+charm,매혹,Charm,6,lust,debuff,명중률 대폭 감소,고공격 빌드 견제,4,refresh
+judge,심판,Judge,7,pride,seal,카드 스킬 발동 확률 0% (스킬 봉인),스킬 의존 빌드 견제,2,refresh

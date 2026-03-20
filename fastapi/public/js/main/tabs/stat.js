@@ -6,10 +6,10 @@ import { Store } from '../../store.js';
 
 const STATS = [
     { key: 'str', label: 'STR', desc: '물리 공격력' },
-    { key: 'int', label: 'INT', desc: '마법 공격력' },
-    { key: 'agi', label: 'AGI', desc: '행동력·명중·회피' },
+    { key: 'dex', label: 'DEX', desc: '공격속도·명중·회피' },
     { key: 'vit', label: 'VIT', desc: 'HP·물리 방어' },
-    { key: 'will', label: 'WIL', desc: '용병 보정·저항' },
+    { key: 'lck', label: 'LCK', desc: '치명타 확률·데미지' },
+    { key: 'int', label: 'INT', desc: '마법 공격력·스킬 증폭' },
 ];
 
 const StatTab = {

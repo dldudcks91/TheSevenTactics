@@ -9,7 +9,7 @@
 - 골드 50000
 - 장비 3개 지급
 """
-import hashlib
+import bcrypt
 import uuid
 from database import SessionLocal, init_db
 from models import User, UserStat, Hero, Party, Item
@@ -29,7 +29,7 @@ def seed():
             return
 
         # 1. 유저 생성
-        pw_hash = hashlib.sha256("1234".encode()).hexdigest()
+        pw_hash = bcrypt.hashpw("1234".encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
         user = User(user_name="demo", password_hash=pw_hash, gold=50000, current_stage=101)
         db.add(user)
         db.flush()
@@ -39,11 +39,11 @@ def seed():
         stat = UserStat(
             user_no=user.user_no,
             level=5, exp=0,
-            stat_str=12, stat_int=8, stat_agi=10, stat_vit=10, stat_will=10,
+            stat_str=15, stat_dex=12, stat_vit=12, stat_lck=10, stat_int=11,
             stat_points=10,
         )
         db.add(stat)
-        print(f"[OK] 스탯 생성: Lv5, STR12/INT8/AGI10/VIT10/WIL10")
+        print(f"[OK] 스탯 생성: Lv5, STR15/DEX12/VIT12/LCK10/INT11")
 
         # 3. 영웅 생성
         baal = Hero(
@@ -92,25 +92,29 @@ def seed():
         db.add(party)
         print(f"[OK] 파티 편성: 바알 / 사탄 / 밴시")
 
-        # 5. 장비 지급
+        # 5. 장비 지급 (5부위: weapon/armor/helmet/gloves/boots)
         equips = [
-            ("w002", "weapon", baal.hero_uid),
-            ("a002", "armor", baal.hero_uid),
-            ("w001", "weapon", satan.hero_uid),
+            ("100102", "weapon", baal.hero_uid, "magic"),    # Scimitar (한손검 중형)
+            ("200101", "armor", baal.hero_uid, "magic"),     # Dusk Shroud (중갑 소형)
+            ("300101", "helmet", baal.hero_uid, "magic"),    # Cap (생존 투구)
+            ("400101", "gloves", baal.hero_uid, "magic"),    # Leather Gloves
+            ("500101", "boots", baal.hero_uid, "magic"),     # Boots
+            ("100301", "weapon", satan.hero_uid, "magic"),   # Tomahawk (도끼 소형)
+            ("200201", "armor", satan.hero_uid, "magic"),    # Ghost Armor (경갑)
         ]
-        for eid, slot, huid in equips:
+        for eid, slot, huid, rarity in equips:
             item = Item(
                 item_uid=str(uuid.uuid4()),
                 user_no=user.user_no,
                 base_item_id=eid,
-                item_level=1,
-                rarity="common",
+                item_level=3,
+                rarity=rarity,
                 equip_slot=slot,
                 is_equipped=True,
                 equipped_hero_uid=huid,
             )
             db.add(item)
-        print(f"[OK] 장비 3개 지급 (강철 대검, 강철 갑옷, 낡은 검)")
+        print(f"[OK] 장비 7개 지급 (바알 5부위 + 사탄 무기/갑옷)")
 
         db.commit()
         print("\n=== 데모 시드 완료 ===")
