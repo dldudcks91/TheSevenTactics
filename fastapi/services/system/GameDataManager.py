@@ -84,12 +84,12 @@ class GameDataManager:
                 
                 # "Wolf_1" 형태의 키로 저장
                 key_str = f"{sub_type}_{m_class}"
+                # 3부위 매핑: 투구+장갑+신발 → accessory
+                acc_weight = int(row.get("투구", 0)) + int(row.get("장갑", 0)) + int(row.get("신발", 0))
                 cls.REQUIRE_CONFIGS['drop_equip_weights'][key_str] = {
                     "weapon": int(row.get("무기", 0)),
                     "armor": int(row.get("갑옷", 0)),
-                    "helmet": int(row.get("투구", 0)),
-                    "gloves": int(row.get("장갑", 0)),
-                    "boots": int(row.get("신발", 0))
+                    "accessory": acc_weight,
                 }
 
             # 5. Rarity Config

@@ -6,7 +6,7 @@
 import { apiCall } from '../api.js';
 import { saveSession } from '../session.js';
 import { showLoading, hideLoading } from '../utils.js';
-import { switchView } from '../app.js';
+import { switchScene } from '../app.js';
 
 const LoginScreen = {
     el: null,
@@ -120,7 +120,12 @@ const LoginScreen = {
             if (result?.success) {
                 const { user_no, user_name, session_id } = result.data;
                 saveSession(session_id, user_no, user_name);
-                switchView('main');
+                // 신규 가입(1003) → 프롤로그, 기존 로그인(1007) → 메인
+                if (apiCode === 1003) {
+                    switchScene('prologue');
+                } else {
+                    switchScene('main');
+                }
             } else if (result) {
                 this.refs.error.textContent = result.message || '요청에 실패했습니다.';
             } else {

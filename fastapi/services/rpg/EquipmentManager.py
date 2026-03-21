@@ -6,7 +6,22 @@ from services.system.ErrorCode import ErrorCode, error_response
 
 logger = logging.getLogger("RPG_SERVER")
 
-EQUIP_SLOTS = {"weapon", "armor", "helmet", "gloves", "boots"}
+EQUIP_SLOTS = {"weapon", "armor", "accessory"}
+
+# CSV가 5부위로 되어있을 경우 3부위로 매핑
+SLOT_REMAP = {
+    "weapon": "weapon",
+    "armor": "armor",
+    "helmet": "accessory",
+    "gloves": "accessory",
+    "boots": "accessory",
+    "accessory": "accessory",
+}
+
+
+def remap_slot(slot: str) -> str:
+    """equipment_base.csv의 main_group을 3부위로 매핑"""
+    return SLOT_REMAP.get(slot, slot)
 
 
 class EquipmentManager:
@@ -16,7 +31,7 @@ class EquipmentManager:
     def _item_to_dict(cls, item, equip_map):
         """Item ORM → 클라이언트 dict 변환"""
         base = equip_map.get(item.base_item_id, {})
-        main_group = base.get("main_group", item.equip_slot or "")
+        main_group = remap_slot(base.get("main_group", item.equip_slot or ""))
         return {
             "item_uid": item.item_uid,
             "base_item_id": item.base_item_id,
@@ -90,7 +105,8 @@ class EquipmentManager:
             # 장비 슬롯 확인 (equipment_base.csv의 main_group)
             equip_map = GameDataManager.REQUIRE_CONFIGS.get("equip_base_map", {})
             base = equip_map.get(item.base_item_id, {})
-            slot = base.get("main_group", item.equip_slot or "")
+            raw_slot = base.get("main_group", item.equip_slot or "")
+            slot = remap_slot(raw_slot)
             if slot not in EQUIP_SLOTS:
                 return error_response(ErrorCode.EQUIP_SLOT_MISMATCH, f"장착 불가 슬롯: {slot}")
 

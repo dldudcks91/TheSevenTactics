@@ -6,6 +6,7 @@ from models import User, UserStat, Hero, Party, Item
 from services.system.GameDataManager import GameDataManager
 from services.system.ErrorCode import ErrorCode, error_response
 from services.rpg.ItemDropManager import ItemDropManager
+from services.rpg.StatusEffectManager import StatusEffectManager
 
 logger = logging.getLogger("RPG_SERVER")
 
@@ -38,6 +39,15 @@ CHAPTER_INFO = {
 
 STAGE_NAMES = {1: "외곽 탐색", 2: "내부 침투", 3: "핵심부 돌파", 4: "보스전"}
 
+# ── 바알 지휘관 버프 (레벨 기반, HoMM3 스타일) ──
+# 바알은 전투에 참여하지 않고 밖에서 파티를 지원
+BAAL_COMMANDER_BUFFS = {
+    "atk_pct": 0.01,       # 레벨당 아군 공격력 +1%
+    "def_pct": 0.01,       # 레벨당 아군 방어력 +1%
+    "hp_pct": 0.005,       # 레벨당 아군 HP +0.5%
+    "crit": 0.2,           # 레벨당 치명타 확률 +0.2%
+}
+
 
 class BattleManager:
     """3v3 파티 자동전투 시뮬레이션 (API 3xxx)"""
@@ -66,7 +76,7 @@ class BattleManager:
             if not party:
                 return error_response(ErrorCode.INVALID_REQUEST, "파티가 편성되지 않았습니다.")
 
-            # 아군 유닛 생성
+            # 아군 유닛 생성 (바알은 지휘관 — 전투 유닛에서 제외)
             allies, hero_list = [], []
             for slot_uid in [party.slot_1, party.slot_2, party.slot_3]:
                 if slot_uid is None:
@@ -81,6 +91,10 @@ class BattleManager:
 
             if not allies:
                 return error_response(ErrorCode.INVALID_REQUEST, "파티에 영웅이 없습니다.")
+
+            # 바알 지휘관 버프 적용 (HoMM3 스타일)
+            baal_lv = stat.level
+            commander_info = cls._apply_commander_buff(allies, baal_lv)
 
             # 진영 시너지
             synergy_info = cls._apply_faction_synergy(allies, hero_list)
@@ -205,6 +219,7 @@ class BattleManager:
                 "data": {
                     "result": result,
                     "stage": stage_info,
+                    "commander": commander_info,
                     "synergy": synergy_info,
                     "allies": ally_snap,
                     "enemies": enemy_snap,
@@ -232,21 +247,14 @@ class BattleManager:
         """B안: 1스탯 1역할, 명중/회피 없음, 스킬 타이머 방식"""
         hero_base = GameDataManager.REQUIRE_CONFIGS.get("hero_bases", {}).get(hero.hero_id, {})
         equip_map = GameDataManager.REQUIRE_CONFIGS.get("equip_base_map", {})
-        is_baal = hero.hero_id == "baal"
 
-        # ── 기본 스탯 결정 ──
-        if is_baal:
-            base_str, base_dex, base_vit, base_lck, base_int = (
-                user_stat.stat_str, user_stat.stat_dex,
-                user_stat.stat_vit, user_stat.stat_lck, user_stat.stat_int)
-            lv = user_stat.level
-        else:
-            base_str = int(hero_base.get("base_str", 10))
-            base_dex = int(hero_base.get("base_dex", 10))
-            base_vit = int(hero_base.get("base_vit", 10))
-            base_lck = int(hero_base.get("base_lck", 10))
-            base_int = int(hero_base.get("base_int", 10))
-            lv = hero.level
+        # ── 기본 스탯 결정 (전원 동등 — hero_base.csv 기반) ──
+        base_str = int(hero_base.get("base_str", 10))
+        base_dex = int(hero_base.get("base_dex", 10))
+        base_vit = int(hero_base.get("base_vit", 10))
+        base_lck = int(hero_base.get("base_lck", 10))
+        base_int = int(hero_base.get("base_int", 10))
+        lv = hero.level
 
         total_str = base_str + lv * 2
         total_dex = base_dex + lv * 2
@@ -290,12 +298,6 @@ class BattleManager:
         crit = min(80, total_lck * 0.5 + skill_bonus.get("crit", 0))
 
         final_atk = max(atk, matk)
-
-        # 바알 고유 패시브: 전 스탯 +5%
-        if is_baal:
-            hp = int(hp * 1.05)
-            final_atk = int(final_atk * 1.05)
-            defense = int(defense * 1.05)
 
         return {
             "name": hero_base.get("hero_name", hero.hero_id),
@@ -375,6 +377,33 @@ class BattleManager:
             "dmg_reduction": 0, "atk_stack": 0,
             "_atk_stacked": 0, "_statuses": [],
             "_phase": 1,
+        }
+
+    # ══════════════════════════════════════════════
+    # 바알 지휘관 버프 (HoMM3 스타일)
+    # ══════════════════════════════════════════════
+
+    @classmethod
+    def _apply_commander_buff(cls, allies, baal_level):
+        """바알 레벨 기반으로 아군 전원에게 지휘관 버프 적용"""
+        atk_bonus = baal_level * BAAL_COMMANDER_BUFFS["atk_pct"]
+        def_bonus = baal_level * BAAL_COMMANDER_BUFFS["def_pct"]
+        hp_bonus = baal_level * BAAL_COMMANDER_BUFFS["hp_pct"]
+        crit_bonus = baal_level * BAAL_COMMANDER_BUFFS["crit"]
+
+        for unit in allies:
+            unit["atk"] = int(unit["atk"] * (1 + atk_bonus))
+            unit["defense"] = int(unit["defense"] * (1 + def_bonus))
+            unit["hp"] = int(unit["hp"] * (1 + hp_bonus))
+            unit["max_hp"] = int(unit["max_hp"] * (1 + hp_bonus))
+            unit["crit"] = min(80, unit["crit"] + crit_bonus)
+
+        return {
+            "baal_level": baal_level,
+            "atk_bonus": f"+{atk_bonus * 100:.0f}%",
+            "def_bonus": f"+{def_bonus * 100:.0f}%",
+            "hp_bonus": f"+{hp_bonus * 100:.0f}%",
+            "crit_bonus": f"+{crit_bonus:.1f}%",
         }
 
     # ══════════════════════════════════════════════
@@ -467,41 +496,11 @@ class BattleManager:
         while turn < max_turns:
             turn += 1
 
-            # ── 상태이상 틱 (턴 시작) ──
+            # ── 상태이상 틱 (턴 시작) — StatusEffectManager 위임 ──
             for u in all_units:
                 if not u["alive"]:
                     continue
-                new_statuses = []
-                for st in u.get("_statuses", []):
-                    if st["type"] == "freeze":
-                        # 동결: 이번 턴 행동 불가
-                        u["_frozen_this_turn"] = True
-                        st["turns"] -= 1
-                        if st["turns"] > 0:
-                            new_statuses.append(st)
-                        log.append({"turn": turn, "type": "status_tick", "target": u["name"],
-                                    "status": "freeze", "value": 0})
-                    elif st["type"] in ("burn", "poison"):
-                        tick_dmg = max(1, int(u["max_hp"] * STATUS_TICK_DMG))
-                        u["hp"] = max(0, u["hp"] - tick_dmg)
-                        st["turns"] -= 1
-                        if st["turns"] > 0:
-                            new_statuses.append(st)
-                        log.append({"turn": turn, "type": "status_tick", "target": u["name"],
-                                    "status": st["type"], "value": tick_dmg, "target_hp": u["hp"]})
-                        if u["hp"] <= 0:
-                            u["alive"] = False
-                    elif st["type"] == "charm":
-                        st["turns"] -= 1
-                        if st["turns"] > 0:
-                            new_statuses.append(st)
-                        log.append({"turn": turn, "type": "status_tick", "target": u["name"],
-                                    "status": "charm", "value": 0})
-                    else:
-                        st["turns"] -= 1
-                        if st["turns"] > 0:
-                            new_statuses.append(st)
-                u["_statuses"] = new_statuses
+                StatusEffectManager.tick_statuses(u, log, turn)
 
                 if not u["alive"]:
                     if not any(e["alive"] for e in enemies):
@@ -509,11 +508,11 @@ class BattleManager:
                     if not any(a["alive"] for a in allies):
                         return log, "defeat"
 
-            # ── 행동 게이지 충전 ──
+            # ── 행동 게이지 충전 (freeze → 속도 50% 감소, stun → 충전 안 함) ──
             for u in all_units:
-                if u["alive"] and not u.get("_frozen_this_turn"):
-                    u["action_gauge"] += u["speed"]
-                u["_frozen_this_turn"] = False
+                if u["alive"] and StatusEffectManager.can_act(u):
+                    speed_mod = StatusEffectManager.get_speed_modifier(u)
+                    u["action_gauge"] += u["speed"] * speed_mod
 
             actors = sorted(
                 [u for u in all_units if u["alive"] and u["action_gauge"] >= 100],
@@ -525,8 +524,14 @@ class BattleManager:
                     continue
                 actor["action_gauge"] -= 100
 
+                # stun → 행동 불가
+                if not StatusEffectManager.can_act(actor):
+                    log.append({"turn": turn, "type": "status_tick", "target": actor["name"],
+                                "status": "stun", "value": 0})
+                    continue
+
                 # 매혹 상태 → 같은 편 공격
-                charmed = any(s["type"] == "charm" for s in actor.get("_statuses", []))
+                charmed = StatusEffectManager.is_charmed(actor)
 
                 if actor["side"] == "ally":
                     targets = [u for u in (allies if charmed else enemies) if u["alive"] and u is not actor]
@@ -539,23 +544,24 @@ class BattleManager:
                 target = min(targets, key=lambda t: t["hp"])
 
                 # ── 멀티 스킬 쿨다운 체크 ──
-                # 모든 스킬의 쿨다운을 1 감소, 사용 가능한 첫 스킬 발동
                 used_skill = False
                 skill_name = ""
                 skill_mult = 1.0
                 status_to_apply = None
+                skill_blocked = StatusEffectManager.is_skill_blocked(actor)
 
                 for sk in actor.get("_skills", []):
                     sk["_cd_left"] = max(0, sk.get("_cd_left", 0) - 1)
 
-                for sk in actor.get("_skills", []):
-                    if sk["_cd_left"] <= 0:
-                        used_skill = True
-                        skill_name = sk["name"]
-                        skill_mult = sk.get("mult", 2.0)
-                        status_to_apply = sk.get("status")
-                        sk["_cd_left"] = sk.get("cd", 3)  # 쿨다운 시작
-                        break  # 우선순위 높은 첫 스킬만 사용
+                if not skill_blocked:
+                    for sk in actor.get("_skills", []):
+                        if sk["_cd_left"] <= 0:
+                            used_skill = True
+                            skill_name = sk["name"]
+                            skill_mult = sk.get("mult", 2.0)
+                            status_to_apply = sk.get("status")
+                            sk["_cd_left"] = sk.get("cd", 3)
+                            break
 
                 # ── 누적 공격력 ──
                 stack = actor.get("atk_stack", 0)
@@ -588,13 +594,15 @@ class BattleManager:
                     entry["skill_name"] = skill_name
                 log.append(entry)
 
-                # ── 스킬 상태이상 부여 ──
+                # ── 스킬 상태이상 부여 (StatusEffectManager 위임) ──
                 if status_to_apply and target["alive"]:
-                    if random.random() * 100 < status_to_apply.get("chance", 30):
-                        target["_statuses"].append({
-                            "type": status_to_apply["type"],
-                            "turns": status_to_apply.get("turns", 2),
-                        })
+                    applied = StatusEffectManager.apply_status(
+                        target,
+                        status_to_apply["type"],
+                        duration=status_to_apply.get("turns", 2),
+                        chance=status_to_apply.get("chance", 30),
+                    )
+                    if applied:
                         log.append({
                             "turn": turn, "type": "status_apply",
                             "actor": actor["name"], "target": target["name"],
@@ -662,10 +670,7 @@ class BattleManager:
     # 우선순위: 리스트 앞이 높음 (쿨다운 된 것 중 첫 번째 사용)
     # ══════════════════════════════════════════════
     HERO_SKILLS = {
-        "baal": [
-            {"name": "마왕의 일격", "mult": 2.5, "cd": 5, "status": None},
-            {"name": "지옥의 파동", "mult": 1.8, "cd": 3, "status": {"type": "burn", "chance": 40, "turns": 2}},
-        ],
+        # 바알은 지휘관 — 전투 스킬 없음 (파티 밖에서 버프로 지원)
         "satan": [
             {"name": "분노의 질주", "mult": 2.2, "cd": 4, "status": {"type": "burn", "chance": 50, "turns": 3}},
             {"name": "화염 베기", "mult": 1.5, "cd": 2, "status": None},

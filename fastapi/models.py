@@ -51,7 +51,7 @@ class UserStat(Base):
     user = relationship("User", back_populates="stat")
 
 # ==========================================
-# 3. Item 테이블 (장비 아이템 — 5부위: weapon/armor/helmet/gloves/boots)
+# 3. Item 테이블 (장비 아이템 — 3부위: weapon/armor/accessory)
 # ==========================================
 class Item(Base):
     __tablename__ = "items"
@@ -68,7 +68,7 @@ class Item(Base):
     set_id = Column(String(50), nullable=True)           # 세트 ID
     dynamic_options = Column(JSON, nullable=True)         # 공통 옵션 + 수치
     is_equipped = Column(Boolean, default=False, index=True)
-    equip_slot = Column(String(20), nullable=True)       # weapon/armor/helmet/gloves/boots
+    equip_slot = Column(String(20), nullable=True)       # weapon/armor/accessory
     equipped_hero_uid = Column(Integer, ForeignKey("heroes.hero_uid"), nullable=True)
 
     # 관계 설정
@@ -83,6 +83,7 @@ class Hero(Base):
     hero_uid = Column(Integer, primary_key=True, autoincrement=True)
     user_no = Column(Integer, ForeignKey("users.user_no"), index=True, nullable=False)
     hero_id = Column(String(50), nullable=False)         # 영웅 기본 ID (hero_base.csv 참조)
+    job = Column(String(20), nullable=False, default="warrior")  # warrior/knight/mage/assassin/healer
     grade = Column(String(20), default="common")          # common/uncommon/rare/legendary
     faction = Column(String(20), nullable=False)           # human/demon/celestial
 
@@ -112,9 +113,9 @@ class Party(Base):
     __tablename__ = "parties"
 
     user_no = Column(Integer, ForeignKey("users.user_no"), primary_key=True)
-    slot_1 = Column(Integer, nullable=True)    # hero_uid (바알=본캐, 항상 슬롯1)
-    slot_2 = Column(Integer, nullable=True)    # hero_uid
-    slot_3 = Column(Integer, nullable=True)    # hero_uid
+    slot_1 = Column(Integer, nullable=True)    # hero_uid (자유 편성)
+    slot_2 = Column(Integer, nullable=True)    # hero_uid (자유 편성)
+    slot_3 = Column(Integer, nullable=True)    # hero_uid (자유 편성)
 
     # 관계 설정
     user = relationship("User", back_populates="party")

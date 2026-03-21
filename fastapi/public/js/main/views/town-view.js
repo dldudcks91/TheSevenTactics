@@ -104,7 +104,7 @@ const TownView = {
             const MS = m.default;
             switch (npc) {
                 case 'gate':
-                    this._openStagePopup();
+                    MS.switchRightView('chapter-map');
                     break;
                 case 'tavern':
                     MS.switchRightView('tavern');

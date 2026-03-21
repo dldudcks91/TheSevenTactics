@@ -8,6 +8,8 @@ import TownView from './main/views/town-view.js';
 import TavernView from './main/views/tavern-view.js';
 import BattleView from './main/views/battle-view.js';
 import PreBattleView from './main/views/prebattle-view.js';
+import ChapterMapView from './main/views/chapter-map-view.js';
+import StageSelectView from './main/views/stage-select-view.js';
 import { apiCall } from './api.js';
 import { Store } from './store.js';
 import { showLoading, hideLoading } from './utils.js';
@@ -18,6 +20,8 @@ const VIEW_MODULES = {
     tavern: TavernView,
     battle: BattleView,
     prebattle: PreBattleView,
+    'chapter-map': ChapterMapView,
+    'stage-select': StageSelectView,
 };
 
 const MainScreen = {

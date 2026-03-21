@@ -2,6 +2,7 @@ import uuid
 import random
 import logging
 from services.system.GameDataManager import GameDataManager
+from services.rpg.EquipmentManager import remap_slot
 
 logger = logging.getLogger("RPG_SERVER")
 
@@ -182,7 +183,7 @@ class ItemDropManager:
             "suffix_id": suffix_id,
             "set_id": prefix_id,  # 세트 = 접두 죄종
             "dynamic_options": dynamic_options,
-            "equip_slot": base.get("main_group", ""),
+            "equip_slot": remap_slot(base.get("main_group", "")),
             # 클라이언트 표시용
             "item_name": base.get("item_base", ""),
             "main_group": base.get("main_group", ""),

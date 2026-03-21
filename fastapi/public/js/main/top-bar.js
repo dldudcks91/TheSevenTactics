@@ -5,7 +5,7 @@
 import { Store } from '../store.js';
 import { formatGold } from '../utils.js';
 import { clearSession } from '../session.js';
-import { switchView } from '../app.js';
+import { switchScene } from '../app.js';
 
 const TopBar = {
     el: null,
@@ -45,18 +45,15 @@ const TopBar = {
         this._handleEvent = this._onEvent.bind(this);
         el.addEventListener('pointerdown', this._handleEvent);
 
-        // Store 구독 — TheSevenTactics 5스탯
+        // Store 구독
         this._unsubscribers.push(
             Store.subscribe('user.name', (v) => { this.refs.name.textContent = v; }),
-            Store.subscribe('user.level', (v) => { this.refs.level.textContent = `Lv.${v}`; }),
+            Store.subscribe('user.level', (v) => {
+                this.refs.level.textContent = `Lv.${v}`;
+                this._renderStats();
+            }),
             Store.subscribe('user.gold', (v) => { this.refs.gold.textContent = formatGold(v); }),
             Store.subscribe('user.exp', () => { this._renderExp(); }),
-            Store.subscribe('user.stat_points', () => { this._renderStats(); }),
-            Store.subscribe('stats.str', () => { this._renderStats(); }),
-            Store.subscribe('stats.int', () => { this._renderStats(); }),
-            Store.subscribe('stats.dex', () => { this._renderStats(); }),
-            Store.subscribe('stats.vit', () => { this._renderStats(); }),
-            Store.subscribe('stats.lck', () => { this._renderStats(); }),
         );
     },
 
@@ -74,29 +71,20 @@ const TopBar = {
 
         if (target.dataset.action === 'logout') {
             clearSession();
-            switchView('login');
+            switchScene('login');
         }
     },
 
     _renderStats() {
-        const stats = [
-            { label: 'STR', key: 'stats.str' },
-            { label: 'INT', key: 'stats.int' },
-            { label: 'DEX', key: 'stats.dex' },
-            { label: 'VIT', key: 'stats.vit' },
-            { label: 'LCK', key: 'stats.lck' },
-        ];
+        const level = Store.get('user.level') || 1;
+        const atkBuff = level * 1;
+        const defBuff = level * 1;
 
-        let html = stats.map(s =>
-            `<span class="top-bar-stat-chip"><span>${s.label}</span> <span class="stat-val">${Store.get(s.key) ?? 0}</span></span>`
-        ).join('');
-
-        const sp = Store.get('user.stat_points');
-        if (sp > 0) {
-            html += `<span class="top-bar-stat-chip sp"><span>SP</span> <span class="stat-val">${sp}</span></span>`;
-        }
-
-        this.refs.stats.innerHTML = html;
+        this.refs.stats.innerHTML = `
+            <span class="top-bar-stat-chip"><span>지휘관</span></span>
+            <span class="top-bar-stat-chip"><span>ATK</span> <span class="stat-val">+${atkBuff}%</span></span>
+            <span class="top-bar-stat-chip"><span>DEF</span> <span class="stat-val">+${defBuff}%</span></span>
+        `;
     },
 
     _renderExp() {

@@ -2,7 +2,7 @@ import logging
 import bcrypt
 from sqlalchemy.exc import IntegrityError
 from database import SessionLocal
-from models import User, UserStat, Hero, Party
+from models import User, UserStat, Party
 from services.system.SessionManager import SessionManager
 from services.system.ErrorCode import ErrorCode, error_response
 
@@ -92,27 +92,8 @@ class UserInitManager:
             new_stat = UserStat(user_no=new_user.user_no)
             db.add(new_stat)
 
-            # 바알(본캐) 영웅 자동 생성
-            baal = Hero(
-                user_no=new_user.user_no,
-                hero_id="baal",
-                grade="legendary",
-                faction="demon",
-                skill_tree_1="wrath",
-                skill_tree_2="pride",
-                tree1_points={},
-                tree2_points={},
-                passive_id="passive_baal",
-                active_id="active_baal",
-            )
-            db.add(baal)
-            db.flush()
-
-            # 바알을 슬롯1에 배치한 초기 파티 생성
-            new_party = Party(
-                user_no=new_user.user_no,
-                slot_1=baal.hero_uid,
-            )
+            # 빈 파티 생성 (바알은 지휘관 — 파티 슬롯에 들어가지 않음)
+            new_party = Party(user_no=new_user.user_no)
             db.add(new_party)
 
             # ── [5] 커밋 ──

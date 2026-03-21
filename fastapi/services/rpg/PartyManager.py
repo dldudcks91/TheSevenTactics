@@ -73,34 +73,25 @@ class PartyManager:
 
     @classmethod
     async def set_party(cls, user_no: int, data: dict):
-        """API 6002: 파티 편성 변경"""
+        """API 6002: 파티 편성 변경 — 3슬롯 자유 편성 (바알은 지휘관, 파티 밖)"""
+        slot_1 = data.get("slot_1")  # hero_uid or None
         slot_2 = data.get("slot_2")  # hero_uid or None
         slot_3 = data.get("slot_3")  # hero_uid or None
 
         db = SessionLocal()
         try:
-            # 바알(본캐)의 hero_uid 조회 — 슬롯1은 항상 바알
-            baal = db.query(Hero).filter(
-                Hero.user_no == user_no,
-                Hero.hero_id == "baal"
-            ).first()
-
-            baal_uid = baal.hero_uid if baal else None
-
-            # 슬롯2, 3 영웅 소유권 확인
-            for uid in [slot_2, slot_3]:
-                if uid is not None:
-                    hero = db.query(Hero).filter(
-                        Hero.hero_uid == uid,
-                        Hero.user_no == user_no
-                    ).first()
-                    if not hero:
-                        return error_response(ErrorCode.ITEM_NOT_FOUND, f"영웅(uid={uid})을 찾을 수 없습니다.")
-                    if hero.hero_id == "baal":
-                        return error_response(ErrorCode.INVALID_REQUEST, "바알은 슬롯 1에 고정됩니다.")
+            # 모든 슬롯 영웅 소유권 확인
+            slot_uids = [uid for uid in [slot_1, slot_2, slot_3] if uid is not None]
+            for uid in slot_uids:
+                hero = db.query(Hero).filter(
+                    Hero.hero_uid == uid,
+                    Hero.user_no == user_no
+                ).first()
+                if not hero:
+                    return error_response(ErrorCode.ITEM_NOT_FOUND, f"영웅(uid={uid})을 찾을 수 없습니다.")
 
             # 중복 확인
-            if slot_2 and slot_3 and slot_2 == slot_3:
+            if len(slot_uids) != len(set(slot_uids)):
                 return error_response(ErrorCode.INVALID_REQUEST, "같은 영웅을 중복 배치할 수 없습니다.")
 
             # 파티 업데이트
@@ -109,18 +100,18 @@ class PartyManager:
                 party = Party(user_no=user_no)
                 db.add(party)
 
-            party.slot_1 = baal_uid
+            party.slot_1 = slot_1
             party.slot_2 = slot_2
             party.slot_3 = slot_3
             db.commit()
 
-            logger.info(f"[PartyManager] 파티 변경 (user={user_no}, slots=[{baal_uid},{slot_2},{slot_3}])")
+            logger.info(f"[PartyManager] 파티 변경 (user={user_no}, slots=[{slot_1},{slot_2},{slot_3}])")
 
             return {
                 "success": True,
                 "message": "파티가 편성되었습니다.",
                 "data": {
-                    "slot_1": baal_uid,
+                    "slot_1": slot_1,
                     "slot_2": slot_2,
                     "slot_3": slot_3,
                 },

@@ -106,6 +106,7 @@ class TavernManager:
             new_hero = Hero(
                 user_no=user_no,
                 hero_id=tavern.hero_id,
+                job=hero_base.get("job", "warrior") if hero_base else "warrior",
                 grade=tavern.grade,
                 faction=tavern.faction,
                 skill_tree_1=tavern.skill_tree_1,

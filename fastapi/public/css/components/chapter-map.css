@@ -1,0 +1,126 @@
+/* TheSevenTactics — Chapter Map View */
+
+.cmap-screen { display: flex; flex-direction: column; height: 100%; background: var(--bg-primary); }
+
+.cmap-header {
+    display: flex; align-items: center; gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--bg-secondary); box-shadow: var(--rpg-border-outset); z-index: 2;
+}
+
+.cmap-back-btn {
+    font-family: var(--font-main); font-size: var(--font-size-sm);
+    color: var(--text-secondary); background: var(--bg-tertiary);
+    border: 2px solid var(--border-primary); padding: var(--spacing-xs) var(--spacing-sm);
+    cursor: pointer; min-height: 28px;
+}
+.cmap-back-btn:hover { color: var(--text-primary); }
+
+.cmap-chapter-tabs { display: flex; gap: 2px; flex: 1; justify-content: center; }
+
+.cmap-tab {
+    font-family: var(--font-main); font-size: var(--font-size-sm);
+    color: var(--text-muted); background: var(--bg-tertiary);
+    border: 2px solid var(--border-primary); padding: var(--spacing-xs) var(--spacing-sm);
+    min-width: 28px; min-height: 28px; cursor: pointer;
+}
+.cmap-tab.active {
+    color: var(--text-primary); background: var(--bg-card);
+    border-color: var(--border-secondary); box-shadow: inset 0 0 8px rgba(224, 48, 48, 0.15);
+}
+.cmap-tab.locked { color: var(--text-muted); opacity: 0.4; cursor: not-allowed; }
+
+.cmap-title-bar {
+    display: flex; align-items: center; justify-content: center; gap: var(--spacing-sm);
+    padding: var(--spacing-xs) var(--spacing-md);
+    background: var(--bg-secondary); border-bottom: 2px solid var(--border-primary);
+    font-family: var(--font-bold); font-size: var(--font-size-md);
+}
+.cmap-title-sin { font-size: var(--font-size-sm); padding: 2px var(--spacing-xs); border: 1px solid; }
+.cmap-title-sin.sin-wrath    { color: var(--color-wrath);    border-color: var(--color-wrath); }
+.cmap-title-sin.sin-envy     { color: var(--color-envy);     border-color: var(--color-envy); }
+.cmap-title-sin.sin-greed    { color: var(--color-greed);    border-color: var(--color-greed); }
+.cmap-title-sin.sin-sloth    { color: var(--color-sloth);    border-color: var(--color-sloth); }
+.cmap-title-sin.sin-gluttony { color: var(--color-gluttony); border-color: var(--color-gluttony); }
+.cmap-title-sin.sin-lust     { color: var(--color-lust);     border-color: var(--color-lust); }
+.cmap-title-sin.sin-pride    { color: var(--color-pride);    border-color: var(--color-pride); }
+.cmap-title-name { color: var(--text-primary); }
+
+.cmap-container {
+    flex: 1; position: relative; overflow: hidden;
+    background: var(--bg-primary); border: 2px solid var(--border-primary);
+    margin: var(--spacing-sm); box-shadow: var(--rpg-border-inset);
+}
+
+.cmap-container[data-sin="wrath"]    { background: linear-gradient(135deg, #1a0808 0%, #2a0a0a 50%, #1a0505 100%); }
+.cmap-container[data-sin="envy"]     { background: linear-gradient(135deg, #081a0a 0%, #0a2a0e 50%, #051a08 100%); }
+.cmap-container[data-sin="greed"]    { background: linear-gradient(135deg, #1a1508 0%, #2a200a 50%, #1a1205 100%); }
+.cmap-container[data-sin="sloth"]    { background: linear-gradient(135deg, #0f1218 0%, #151a22 50%, #0d1015 100%); }
+.cmap-container[data-sin="gluttony"] { background: linear-gradient(135deg, #1a0f08 0%, #2a150a 50%, #1a0c05 100%); }
+.cmap-container[data-sin="lust"]     { background: linear-gradient(135deg, #1a0812 0%, #2a0a18 50%, #1a050f 100%); }
+.cmap-container[data-sin="pride"]    { background: linear-gradient(135deg, #10081a 0%, #180a2a 50%, #0e051a 100%); }
+
+.cmap-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+
+.cmap-edge { stroke: var(--border-primary); stroke-width: 0.4; fill: none; stroke-dasharray: 1.5 1; opacity: 0.4; }
+.cmap-edge.active { stroke: var(--text-secondary); stroke-width: 0.5; stroke-dasharray: none; opacity: 0.7; }
+
+.cmap-nodes { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
+
+.cmap-node {
+    position: absolute; transform: translate(-50%, -50%);
+    display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; z-index: 1;
+}
+
+.cmap-node-icon {
+    width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+    font-size: 16px; background: var(--bg-card); border: 2px solid var(--border-secondary);
+    box-shadow: var(--rpg-border-outset);
+}
+
+.cmap-node-label {
+    font-family: var(--font-main); font-size: var(--font-size-xs);
+    color: var(--text-secondary); white-space: nowrap;
+    text-shadow: 1px 1px 2px var(--bg-primary), -1px -1px 2px var(--bg-primary);
+}
+
+.cmap-node-check {
+    position: absolute; top: -4px; right: -4px; width: 14px; height: 14px;
+    font-size: 9px; line-height: 14px; text-align: center;
+    color: var(--bg-primary); background: var(--color-success);
+    border: 1px solid var(--bg-primary); z-index: 2;
+}
+.cmap-node-lock { position: absolute; top: -2px; right: -6px; font-size: 10px; z-index: 2; }
+
+.cmap-node-town .cmap-node-icon { border-color: var(--color-info); background: #182a3a; }
+.cmap-node-hunt .cmap-node-icon { border-color: var(--color-wrath); background: #2a1010; }
+.cmap-node-boss .cmap-node-icon {
+    width: 44px; height: 44px; font-size: 20px;
+    border-color: var(--color-error); background: #3a0808;
+    box-shadow: var(--rpg-border-outset), 0 0 12px rgba(240, 64, 64, 0.3);
+}
+.cmap-node-boss .cmap-node-label { font-family: var(--font-bold); font-size: var(--font-size-sm); color: var(--color-error); }
+
+.cmap-state-locked { cursor: not-allowed; opacity: 0.35; }
+.cmap-state-locked .cmap-node-icon { filter: grayscale(1); }
+.cmap-state-unlocked .cmap-node-icon { animation: cmap-pulse 1.5s ease-in-out infinite; }
+.cmap-state-completed .cmap-node-icon { opacity: 0.75; }
+
+@keyframes cmap-pulse {
+    0%, 100% { box-shadow: var(--rpg-border-outset); }
+    50%      { box-shadow: var(--rpg-border-outset), 0 0 10px rgba(255, 255, 255, 0.2); }
+}
+
+.cmap-character { position: absolute; transform: translate(-50%, -90%); z-index: 10; pointer-events: none; }
+.cmap-character.cmap-char-moving { transition: left 0.4s ease-in-out, top 0.4s ease-in-out; }
+
+.cmap-char-sprite {
+    width: 20px; height: 28px; background: var(--text-primary);
+    border: 2px solid var(--border-highlight); box-shadow: 0 0 6px rgba(232, 232, 240, 0.4);
+    position: relative;
+}
+.cmap-char-sprite::before {
+    content: ''; position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+    width: 12px; height: 12px; background: var(--text-primary);
+    border: 2px solid var(--border-highlight); border-radius: 50%;
+}

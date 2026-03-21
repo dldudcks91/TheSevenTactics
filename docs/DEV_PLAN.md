@@ -172,10 +172,10 @@ API 코드 추가:
 
 | 항목 | 결정 |
 |------|------|
-| 직업 시스템 | 고정 직업 없음 — 베이스 스탯 + 스킬트리 + 장비로 역할 결정 |
+| 직업 시스템 | 5직업 (warrior/knight/mage/assassin/healer) — 영웅 특성으로 결정, 전직 없음 |
 | 역할 태그 | 공격/방어/지원/방해 (UI 가이드용, 시스템 제약 아님) |
-| 장비 슬롯 | 전원 3부위 (무기/갑옷/장신구), 파티 총 9슬롯 |
-| 파티 | 바알(슬롯1 고정) + 영웅 2명 = 3인 |
+| 장비 슬롯 | 전원 3부위 (무기/갑옷/장신구) |
+| 파티 | 영웅 3인 자유 편성 (바알은 HoMM3식 지휘관 — 슬롯 차지 안 함) |
 | 영웅 보유 | 같은 영웅 1체만 |
 | 영웅 구조 | 고유 패시브+액티브(고정) + 베이스 스탯(고정) + 진영(고정) + 등급(랜덤) + 스킬트리 2개(랜덤) |
 | 스킬트리 | 7죄종, 영웅당 2개 보유, 유저가 포인트 직접 배분 |
@@ -189,8 +189,9 @@ API 코드 추가:
 ## 기획 완료 항목
 
 - [x] 스탯 체계 확정: STR/DEX/VIT/LCK/INT (CST→INT 변경, 코스트 삭제)
-- [x] 바알 = 메인 캐릭터 (슬롯1 고정, UserStat 직접 투자)
-- [x] 장비 5부위: 무기/갑옷/투구/장갑/신발 (RPG 구조 이식)
+- [x] 바알 = HoMM3식 지휘관 (전투 밖에서 레벨 기반 버프 제공, 슬롯 차지 안 함)
+- [x] 직업 5종 확정: warrior/knight/mage/assassin/healer (전직 없음, 영웅 특성으로 결정)
+- [x] 장비 3부위: 무기/갑옷/장신구
 - [x] 카드 시스템 삭제 → 스킬트리 직접 투자 방식
 - [x] 전투 공식 이식: ATK × (1-DEF/(DEF+100)) × 사이즈 × 치명타
 - [x] 상태이상 7종 이식 (화상/중독/스턴/빙결/침식/매혹/심판)
@@ -200,23 +201,23 @@ API 코드 추가:
 - [x] 경험치/레벨 이식: Lv1~50, 지수 곡선, 사망 패널티 10%
 - [x] CSV 19개 이식: equipment, monster, stage, drop, spawn, elite, status 등
 
-## Phase 6: RPG 시스템 이식 (진행 중)
+## Phase 6: RPG 시스템 이식 ✅
 
 ```
 서버:
-□ models.py — 장비 5부위 전환 (Item 모델 수정)
-□ models.py — CST→INT 스탯 변경 (UserStat)
-□ models.py — Card/Collection 모델 삭제
-□ InventoryManager — 5부위 장착/해제 + 파티 지원
-□ ItemDropManager — mlvl 기반 드롭 생성 이식
-□ BattleManager — 드롭 연동 (전투 승리 시 아이템 지급)
-□ StatusEffectManager — 상태이상 7종 이식
-□ GameDataManager — 새 CSV 19개 로드
+✅ models.py — 장비 3부위 전환 (weapon/armor/accessory)
+✅ models.py — STR/DEX/VIT/LCK/INT 스탯 확정
+✅ EquipmentManager — 3부위 장착/해제 + remap_slot() 매핑
+✅ ItemDropManager — mlvl 기반 드롭 생성 + 3부위 매핑
+✅ BattleManager — 드롭 연동 (전투 승리 시 아이템 지급)
+✅ StatusEffectManager — 상태이상 7종 (burn/poison/stun/freeze/corrode/charm/judge)
+✅ GameDataManager — CSV 23개 로드 + drop_equip_weights 3부위 매핑
+✅ BattleManager — StatusEffectManager 통합 (stun 행동불가, judge 스킬차단, freeze 속도감소)
 
 클라이언트:
-□ 장비 탭 — 5부위 UI 전환
-□ 전투 결과 — 드롭 아이템 표시
-□ 인벤토리 화면 — 아이템 목록/상세/장착
+✅ 장비 탭 — 3부위 UI (weapon/armor/accessory)
+✅ 전투 결과 — 드롭 아이템 표시 (BattleManager 응답에 포함)
+✅ 인벤토리 화면 — 아이템 목록/상세/장착/판매
 ```
 
 ## 미구현 항목 (향후)
@@ -235,4 +236,4 @@ API 코드 추가:
 
 ---
 
-*마지막 업데이트: 2026-03-20*
+*마지막 업데이트: 2026-03-21*

@@ -1,14 +1,14 @@
 /**
- * TheSevenTactics — Equipment Tab (5부위: weapon/armor/helmet/gloves/boots)
+ * TheSevenTactics — Equipment Tab (3부위: weapon/armor/accessory)
  * 영웅별 장비 장착/해제 + 인벤토리 + 판매
  */
 import { apiCall } from '../../api.js';
 import { showToast } from '../../utils.js';
 
 const SLOT_LABEL = {
-    weapon: '무기', armor: '갑옷', helmet: '투구', gloves: '장갑', boots: '신발',
+    weapon: '무기', armor: '갑옷', accessory: '장신구',
 };
-const SLOT_ORDER = ['weapon', 'armor', 'helmet', 'gloves', 'boots'];
+const SLOT_ORDER = ['weapon', 'armor', 'accessory'];
 const RARITY_COLOR = { magic: '#6688ff', rare: '#ffcc00', craft: '#ff6600', unique: '#ff44aa' };
 
 const EquipTab = {
@@ -62,7 +62,7 @@ const EquipTab = {
         }
         html += '</div>';
 
-        // 5부위 장착 슬롯
+        // 3부위 장착 슬롯
         const equipped = this._items.filter(it => it.is_equipped && it.equipped_hero_uid === this._selectedHeroUid);
         const equippedBySlot = {};
         for (const it of equipped) equippedBySlot[it.equip_slot || it.main_group] = it;
