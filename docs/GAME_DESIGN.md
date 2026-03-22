@@ -107,6 +107,11 @@
 [루시퍼] → 배신하지 않았다. 바알을 살리기 위해 "죽이지 않는 추락"을 유도
 ```
 
+> **상세 스토리 문서**: [docs/story/](story/) 참조
+> - [story_guide.md](story/story_guide.md) — 작가 톤, 세계관, 배신의 밤 구조
+> - [story_line.md](story/story_line.md) — 프롤로그 → 7챕터 → 엔딩 전체 흐름
+> - [chapters/](story/chapters/) — 챕터별 상세 서사, 보스 대사, 인게임 텍스트
+
 ---
 
 ## 3. 캐릭터 시스템
